@@ -2,8 +2,10 @@
 <html>
 
 <head>
+    <meta charset='utf-8'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <style>
         html,
         body,
@@ -12,14 +14,28 @@
             height: 100%;
         }
 
+
         .chat-panel {
             width: 100%;
+            padding: 15px 5px;
         }
 
-        .chat-panel>.chat-form {
-            position: absolute;
-            bottom: 20px;
-            width: inherit;
+        .chat-panel .chat-list {
+            margin: 10px 0;
+            height: 75%;
+            overflow-y: auto;
+        }
+
+        .chat-panel .chat-form {
+            height: 20%;
+        }
+
+        .chat-author {
+            font-weight: 600;
+        }
+
+        .chat-message {
+            overflow-wrap: break-word;
         }
     </style>
 </head>

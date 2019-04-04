@@ -27,7 +27,6 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
 
         var socket: SocketIOClient.Socket = io();
         socket.on('messageAdded', (msg: any) => {
-            console.log(msg);
             this.setState(state => {
                 const newMsgs = [...state.messages, msg];
 
@@ -35,10 +34,10 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
                     messages: newMsgs
                 };
             });
+            $('.chat-list').scrollTop($('.chat-list')[0].scrollHeight); // for chat-panel component
         });
 
         socket.on('messageDeleted', (msg: any) => {
-            console.log(msg);
             this.setState(state => {
                 const newMsgs = state.messages.filter((m) => m._id !== msg._id);
 
@@ -88,6 +87,7 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
                     messages: newMsgs
                 };
             });
+            $('.chat-list').scrollTop($('.chat-list')[0].scrollHeight); // for chat-panel component
         })
     }
 
@@ -100,7 +100,7 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
                             <h1 className="display-4">Page Content</h1>
                         </div>
                     </div>
-                    <div className="col-4">
+                    <div className="col-4 h-100">
                         <ChatPanel name={this.state.name} message={this.state.message} messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)}
                             nameChange={this.nameChange.bind(this)} messageChange={this.messageChange.bind(this)} sendMessage={this.sendMessage.bind(this)} />
                     </div>

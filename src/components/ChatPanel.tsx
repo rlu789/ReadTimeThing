@@ -20,18 +20,20 @@ export class ChatPanel extends React.Component<ChatPanelProps, {}> {
         var msgs = this.props.messages.map((msg, index) => {
             return (
                 <div className="chat-messages">
-                    <h4>{msg.name}</h4>
+                    <span className="chat-author">{msg.name}</span>
                     <button type="button" className="close" onClick={() => this.props.deleteMessage(index)}>
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <p>{msg.message}</p>
+                    <p className="chat-message">{msg.message}</p>
                 </div>
             );
         });
         return (
             <div className="chat-panel h-100">
-                <button onClick={() => this.props.loadMoreMsgs()} className="btn btn-info">Load More</button>
-                {msgs}
+                <button onClick={() => this.props.loadMoreMsgs()} className="btn btn-info w-100">Load More</button>
+                <div className="chat-list">
+                    {msgs}
+                </div>
                 <div className="chat-form">
                     <input className="form-control" placeholder="Name" value={this.props.name} onChange={this.props.nameChange}></input> <br />
                     <textarea className="form-control" placeholder="Your Message Here" value={this.props.message} onChange={this.props.messageChange}
