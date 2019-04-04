@@ -2,3 +2,4 @@
 /build
 /dist
 /src/secret.ts
+/.cache

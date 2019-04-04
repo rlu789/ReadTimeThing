@@ -29,7 +29,7 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
         socket.on('messageAdded', (msg: any) => {
             console.log(msg);
             this.setState(state => {
-                const newMsgs = [msg, ...state.messages];
+                const newMsgs = [...state.messages, msg];
 
                 return {
                     messages: newMsgs
@@ -77,12 +77,12 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
             data: this.state.messages[i]
         });
     }
-    
+
     loadMoreMsgs() {
-        $.get('http://localhost:3001/messages', this.state.messages[this.state.messages.length - 1], (data: Array<any>) => {
+        $.get('http://localhost:3001/messages', this.state.messages[0], (data: Array<any>) => {
             // console.log(data);
             this.setState(state => {
-                const newMsgs = state.messages.concat(data);
+                const newMsgs = data.concat(state.messages);
 
                 return {
                     messages: newMsgs
@@ -93,13 +93,18 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
 
     render() {
         return (
-            <div className="container">
-                <br />
-                <div className="jumbotron">
-                    <h1 className="display-4">Page Content</h1>
+            <div className="container-fluid">
+                <div className="row h-100">
+                    <div className="col-8">
+                        <div className="jumbotron">
+                            <h1 className="display-4">Page Content</h1>
+                        </div>
+                    </div>
+                    <div className="col-4">
+                        <ChatPanel name={this.state.name} message={this.state.message} messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)}
+                            nameChange={this.nameChange.bind(this)} messageChange={this.messageChange.bind(this)} sendMessage={this.sendMessage.bind(this)} />
+                    </div>
                 </div>
-                <ChatPanel name={this.state.name} message={this.state.message} messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)} 
-                    nameChange={this.nameChange.bind(this)} messageChange={this.messageChange.bind(this)} sendMessage={this.sendMessage.bind(this)} />
             </div>
         );
     }

@@ -19,7 +19,7 @@ export class ChatPanel extends React.Component<ChatPanelProps, {}> {
     render() {
         var msgs = this.props.messages.map((msg, index) => {
             return (
-                <div>
+                <div className="chat-messages">
                     <h4>{msg.name}</h4>
                     <button type="button" className="close" onClick={() => this.props.deleteMessage(index)}>
                         <span aria-hidden="true">&times;</span>
@@ -29,14 +29,14 @@ export class ChatPanel extends React.Component<ChatPanelProps, {}> {
             );
         });
         return (
-            <div>
+            <div className="chat-panel h-100">
                 <button onClick={() => this.props.loadMoreMsgs()} className="btn btn-info">Load More</button>
                 {msgs}
-                <br />
-                <input className="form-control" placeholder="Name" value={this.props.name} onChange={this.props.nameChange}></input>
-                <br />
-                <textarea className="form-control" placeholder="Your Message Here" value={this.props.message} onChange={this.props.messageChange} 
-                    onKeyDownCapture={(e) => this.props.sendMessage(e)}></textarea>
+                <div className="chat-form">
+                    <input className="form-control" placeholder="Name" value={this.props.name} onChange={this.props.nameChange}></input> <br />
+                    <textarea className="form-control" placeholder="Your Message Here" value={this.props.message} onChange={this.props.messageChange}
+                        onKeyDownCapture={(e) => this.props.sendMessage(e)}></textarea>
+                </div>
             </div>
         );
     }

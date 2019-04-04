@@ -22,7 +22,7 @@ var Message = mongoose.model('Message', new mongoose.Schema({
 app.get('/messages', (req, res) => {
   var conditions = req.query.createAt ? { createAt: { $lt: <Date>req.query.createAt } } : { createAt: { $gte: new Date(2000, 1, 1) } };
   Message.find(conditions).sort({ createAt: -1 }).limit(5).exec((err, messages) => {
-    res.send(messages);
+    res.send(messages.reverse());
   });
 });
 
