@@ -25,10 +25,6 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
             messages: props.messages
         };
 
-        this.nameChange = this.nameChange.bind(this);
-        this.messageChange = this.messageChange.bind(this);
-        this.sendMessage = this.sendMessage.bind(this);
-
         var socket: SocketIOClient.Socket = io();
         socket.on('messageAdded', (msg: any) => {
             console.log(msg);
@@ -36,7 +32,6 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
                 const newMsgs = [msg, ...state.messages];
 
                 return {
-                    message: '',
                     messages: newMsgs
                 };
             });
@@ -61,14 +56,20 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
         this.setState({ message: event.currentTarget.value });
     }
 
-    sendMessage() {
-        var obj = {
-            name: this.state.name,
-            message: this.state.message
-        };
-        $.post('http://localhost:3001/messages', obj);
+    sendMessage(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+        if (event.key == 'Enter') {
+            event.stopPropagation();
+            event.preventDefault();
+            var obj = {
+                name: this.state.name,
+                message: this.state.message
+            };
+            $.post('http://localhost:3001/messages', obj);
+
+            this.setState({ message: '' });
+        }
     }
-    
+
     deleteMessage(i: number) {
         $.ajax({
             url: 'http://localhost:3001/messages',
@@ -76,7 +77,7 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
             data: this.state.messages[i]
         });
     }
-
+    
     loadMoreMsgs() {
         $.get('http://localhost:3001/messages', this.state.messages[this.state.messages.length - 1], (data: Array<any>) => {
             // console.log(data);
@@ -95,32 +96,22 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
             <div className="container">
                 <br />
                 <div className="jumbotron">
-                    <h1 className="display-4">Send Message</h1>
-                    <br />
-                    <input className="form-control" placeholder="Name" value={this.state.name} onChange={this.nameChange}></input>
-                    <br />
-                    <textarea className="form-control" placeholder="Your Message Here" value={this.state.message} onChange={this.messageChange}></textarea>
-                    <br />
-                    <button onClick={this.sendMessage} className="btn btn-success">Send</button>
+                    <h1 className="display-4">Page Content</h1>
                 </div>
-                <ChatPanel messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)} />
+                <ChatPanel name={this.state.name} message={this.state.message} messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)} 
+                    nameChange={this.nameChange.bind(this)} messageChange={this.messageChange.bind(this)} sendMessage={this.sendMessage.bind(this)} />
             </div>
         );
     }
 }
 
 function complete() {
-    var msgData: Array<any> = [];
     $(() => {
-        getMessages();
-    })
-
-    function getMessages() {
         $.get('http://localhost:3001/messages', (data: Array<any>) => {
             ReactDOM.render(
                 <App messages={data} />,
                 document.getElementById("app")
             );
-        })
-    }
+        });
+    });
 }
