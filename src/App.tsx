@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import { ChangeEvent } from "react";
 import * as SocketIO from "socket.io-client";
 
+import { Youtube } from "./components/Youtube";
 import { ChatPanel } from "./components/ChatPanel";
 
 // a lot of code below is just copy paste will need tech debt
@@ -62,7 +63,7 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
     }
 
     sendMessage(event?: React.KeyboardEvent<HTMLDivElement>, clicked?: boolean) {
-        if ((event && event.key == 'Enter') || clicked) {
+        if ((event && event.key === 'Enter') || clicked) {
             if (event) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -103,9 +104,7 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
             <div className="container-fluid">
                 <div className="row h-100">
                     <div className="col-8">
-                        <div className="jumbotron">
-                            <h1 className="display-4">Page Content</h1>
-                        </div>
+                        <Youtube />
                     </div>
                     <div className="col-4 h-100">
                         <ChatPanel name={this.state.name} message={this.state.message} messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)}
