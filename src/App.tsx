@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { ChangeEvent } from "react";
 import * as SocketIO from "socket.io-client";
 
 import { ChatPanel } from "./components/ChatPanel";
@@ -16,7 +17,11 @@ script.onreadystatechange = function () {
 }
 script.onload = complete;
 
-class App extends React.Component<{ messages: Array<any> }, { messages: Array<any>, name: string, message: string }> {
+interface AppState {
+    messages: Array<any>, name: string, message: string
+}
+
+class App extends React.Component<{ messages: Array<any> }, AppState> {
     constructor(props: { messages: Array<any> }) {
         super(props);
         this.state = {
@@ -48,24 +53,26 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
         });
     }
 
-    nameChange(event: React.FormEvent<HTMLInputElement>) {
-        this.setState({ name: event.currentTarget.value });
-    }
-    messageChange(event: React.FormEvent<HTMLTextAreaElement>) {
-        this.setState({ message: event.currentTarget.value });
+    handleChange(key: string, event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+        var v = event.currentTarget.value;
+        this.setState(prevState => ({
+            ...prevState,
+            [key]: v,
+        }))
     }
 
-    sendMessage(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-        if (event.key == 'Enter') {
-            event.stopPropagation();
-            event.preventDefault();
+    sendMessage(event?: React.KeyboardEvent<HTMLDivElement>, clicked?: boolean) {
+        if ((event && event.key == 'Enter') || clicked) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
             var obj = {
                 name: this.state.name,
                 message: this.state.message
             };
-            $.post('http://localhost:3001/messages', obj);
-
             this.setState({ message: '' });
+            $.post('http://localhost:3001/messages', obj);
         }
     }
 
@@ -102,7 +109,7 @@ class App extends React.Component<{ messages: Array<any> }, { messages: Array<an
                     </div>
                     <div className="col-4 h-100">
                         <ChatPanel name={this.state.name} message={this.state.message} messages={this.state.messages} deleteMessage={this.deleteMessage.bind(this)} loadMoreMsgs={this.loadMoreMsgs.bind(this)}
-                            nameChange={this.nameChange.bind(this)} messageChange={this.messageChange.bind(this)} sendMessage={this.sendMessage.bind(this)} />
+                            handleChange={this.handleChange.bind(this)} sendMessage={this.sendMessage.bind(this)} />
                     </div>
                 </div>
             </div>
