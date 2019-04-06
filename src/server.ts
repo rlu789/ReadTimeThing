@@ -45,11 +45,17 @@ app.delete('/messages', (req, res) => {
   });
 });
 
-app.post('/video', (req, res) => {
+app.post('/cueVideo', (req, res) => {
   io.emit('cueVideo', req.body.video_id);
+  res.sendStatus(200);
 });
 app.post('/playVideo', (req, res) => {
-  io.emit('playVideo', req.body.video_id);
+  io.emit('playVideo');
+  res.sendStatus(200);
+});
+app.post('/pauseVideo', (req, res) => {
+  io.emit('pauseVideo');
+  res.sendStatus(200);
 });
 
 io.on('connection', (socket) => {

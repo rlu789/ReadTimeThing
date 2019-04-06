@@ -1,6 +1,7 @@
 import * as React from "react";
 import { TextField, IconButton } from "@material-ui/core";
 import PlayCircleFilled from "@material-ui/icons/PlayCircleFilled";
+import PauseCircleFilled from "@material-ui/icons/PauseCircleFilled";
 import $ = require('jquery');
 
 interface YoutubeProps {
@@ -9,6 +10,8 @@ interface YoutubeProps {
 
 interface YoutubeState {
     scriptLoaded: boolean;
+    videoCued: boolean;
+    videoPlaying: boolean;
     player: any; // youtube iframe api
 }
 
@@ -23,6 +26,8 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         }
         this.state = {
             scriptLoaded: false,
+            videoCued: false,
+            videoPlaying: false,
             player: null
         };
 
@@ -34,6 +39,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         else throw Error("Unable to add https://www.youtube.com/iframe_api script tag");
 
         window.socket.on('cueVideo', (video_id: string) => {
+            this.setState({ videoCued: false });
             if (this.state.player) {
                 this.state.player.cueVideoById(video_id);
             }
@@ -45,6 +51,11 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                             height: '768',
                             // width: '1024',
                             videoId: video_id,
+                            events: {
+                                'onReady': () => {
+                                    this.setState({ videoCued: true })
+                                }
+                            }
                         })
                 });
             }
@@ -52,7 +63,15 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
 
         window.socket.on('playVideo', () => {
             if (this.state.player) {
+                this.setState({ videoPlaying: true });
                 this.state.player.playVideo();
+            }
+        });
+
+        window.socket.on('pauseVideo', () => {
+            if (this.state.player) {
+                this.setState({ videoPlaying: false });
+                this.state.player.pauseVideo();
             }
         });
     }
@@ -71,7 +90,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             else video_id = input.value;
 
             $.ajax({
-                url: 'http://localhost:3001/video',
+                url: 'http://localhost:3001/cueVideo',
                 type: 'POST',
                 data: { video_id: video_id }
             });
@@ -85,6 +104,13 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         });
     }
 
+    pauseVideo() {
+        $.ajax({
+            url: 'http://localhost:3001/pauseVideo',
+            type: 'POST'
+        });
+    }
+
     render() {
         const scriptLoaded = this.state.scriptLoaded;
         var element: React.ReactElement = <div></div>, controls: React.ReactElement = <div></div>;
@@ -93,12 +119,16 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             element = (<div id="player"></div>);
         }
 
-        if (this.state.player) {
+        if (this.state.videoCued) {
             controls = (
                 <div>
-                <IconButton onClick={this.playVideo}>
-                    <PlayCircleFilled />
-                </IconButton></div>
+                    <IconButton disabled={this.state.videoPlaying} onClick={this.playVideo}>
+                        <PlayCircleFilled />
+                    </IconButton>
+                    <IconButton disabled={!this.state.videoPlaying} onClick={this.pauseVideo}>
+                        <PauseCircleFilled />
+                    </IconButton>
+                </div>
             );
         }
 
