@@ -18,6 +18,13 @@ script.onreadystatechange = function () {
 }
 script.onload = complete;
 
+declare global {
+    interface Window { 
+        onYouTubeIframeAPIReady: (() => void) | undefined;
+        socket: SocketIOClient.Socket
+    }
+}
+
 interface AppState {
     messages: Array<any>, name: string, message: string
 }
@@ -31,8 +38,8 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
             messages: props.messages
         };
 
-        var socket: SocketIOClient.Socket = io();
-        socket.on('messageAdded', (msg: any) => {
+        window.socket = io();
+        window.socket.on('messageAdded', (msg: any) => {
             this.setState(state => {
                 const newMsgs = [...state.messages, msg];
 
@@ -43,7 +50,7 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
             $('.chat-list').scrollTop($('.chat-list')[0].scrollHeight); // for chat-panel component
         });
 
-        socket.on('messageDeleted', (msg: any) => {
+        window.socket.on('messageDeleted', (msg: any) => {
             this.setState(state => {
                 const newMsgs = state.messages.filter((m) => m._id !== msg._id);
 

@@ -45,6 +45,13 @@ app.delete('/messages', (req, res) => {
   });
 });
 
+app.post('/video', (req, res) => {
+  io.emit('cueVideo', req.body.video_id);
+});
+app.post('/playVideo', (req, res) => {
+  io.emit('playVideo', req.body.video_id);
+});
+
 io.on('connection', (socket) => {
   console.log('a user is connected')
   socket.on('disconnect', function(){

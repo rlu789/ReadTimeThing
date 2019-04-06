@@ -25,9 +25,6 @@ export class ChatPanel extends React.Component<ChatPanelProps, {}> {
             return (
                 <div className="chat-messages">
                     <span className="chat-author">{msg.name}</span>
-                    {/* <IconButton>
-                        <DeleteIcon fontSize="small" />
-                    </IconButton> */}
                     <button type="button" className="close" onClick={() => this.props.deleteMessage(index)}>
                         <span aria-hidden="true">&times;</span>
                     </button>
