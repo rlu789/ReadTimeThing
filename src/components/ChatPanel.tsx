@@ -2,22 +2,30 @@ import * as React from "react";
 import { ChangeEvent } from "react";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import $ = require('jquery');
 
 interface ChatPanelProps {
     name: string;
     message: string;
     messages: Array<any>;
     deleteMessage: (index: number) => void;
-    loadMoreMsgs: () => void;
+    loadMoreMsgs: () => Promise<any>;
     handleChange: (key: string, event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
     sendMessage: (event?: React.KeyboardEvent<HTMLDivElement>, clicked?: boolean) => void;
 }
 
-export class ChatPanel extends React.Component<ChatPanelProps, {}> {
+interface ChatPanelState {
+    btnLoading: boolean
+}
+
+export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
     constructor(props: ChatPanelProps) {
         super(props);
+
+        this.state = {
+            btnLoading: false
+        }
     }
 
     render() {
@@ -32,11 +40,17 @@ export class ChatPanel extends React.Component<ChatPanelProps, {}> {
                 </div>
             );
         });
+
+        var internalBtn = this.state.btnLoading ? <CircularProgress size={20} /> : 'Load More';
+
         return (
             <div className="chat-panel h-100">
                 <div className="chat-list">
-                    <Button variant="contained" color="primary" fullWidth={true} onClick={() => this.props.loadMoreMsgs()}>
-                        Load More
+                    <Button disabled={this.state.btnLoading} variant="contained" color="primary" fullWidth={true} onClick={() => {
+                        this.props.loadMoreMsgs().then(() => this.setState({ btnLoading: false }));
+                        this.setState({ btnLoading: true });
+                    }}>
+                        {internalBtn}
                     </Button>
                     {msgs}
                 </div>

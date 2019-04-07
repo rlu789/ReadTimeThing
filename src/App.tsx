@@ -94,7 +94,7 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
     }
 
     loadMoreMsgs() {
-        $.get(Constants.baseURL + 'messages', this.state.messages[0], (data: Array<any>) => {
+        return Promise.resolve($.get(Constants.baseURL + 'messages', this.state.messages[0], (data: Array<any>) => {
             // console.log(data);
             this.setState(state => {
                 const newMsgs = data.concat(state.messages);
@@ -103,8 +103,7 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
                     messages: newMsgs
                 };
             });
-            $('.chat-list').scrollTop($('.chat-list')[0].scrollHeight); // for chat-panel component
-        })
+        }));
     }
 
     render() {
