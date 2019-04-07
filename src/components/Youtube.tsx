@@ -16,6 +16,10 @@ interface YoutubeState {
 }
 
 export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
+    private readonly constants = {
+        YTPlaying: 1
+    }
+
     constructor(props: YoutubeProps) {
         super(props);
 
@@ -42,6 +46,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             this.setState({ videoCued: false });
             if (this.state.player) {
                 this.state.player.cueVideoById(video_id);
+                this.setState({ videoCued: true });
             }
             else {
                 this.setState({
@@ -54,6 +59,9 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                             events: {
                                 'onReady': () => {
                                     this.setState({ videoCued: true })
+                                },
+                                'onStateChange': (event: any) => {
+                                    console.log(event.data);
                                 }
                             }
                         })
@@ -109,6 +117,12 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             url: 'http://localhost:3001/pauseVideo',
             type: 'POST'
         });
+    }
+
+    componentDidUpdate() {
+        // TODO fix tab issue
+        // if (this.state.videoCued)
+        //     $(".ytp-large-play-button.ytp-button").attr('tabindex', () => -1);
     }
 
     render() {
