@@ -6,6 +6,7 @@ import Slider from '@material-ui/lab/Slider';
 
 import $ = require('jquery');
 import { Constants } from "../common/constants";
+import { CurrentVideo } from "../common/interfaces";
 
 interface YoutubeProps {
 
@@ -15,9 +16,12 @@ interface YoutubeState {
     scriptLoaded: boolean;
     videoCued: boolean;
     videoPlaying: boolean;
-    onLoadVidId: string;
     prevYTState: number;
     audioValue: number;
+
+    onLoadVidId: string;
+    onLoadVidTime: number;
+
     player: any; // youtube iframe api
 }
 
@@ -39,20 +43,26 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
             window.onYouTubeIframeAPIReady = undefined;
         };
 
-        this.state = {
-            scriptLoaded: false,
-            videoCued: false,
-            videoPlaying: false,
-            onLoadVidId: "",
-            prevYTState: -2,
-            audioValue: 100,
-            player: null
-        };
-
         this.onReadyFunc = function () {
             self.setState({ videoCued: true });
             self.state.player.playVideo();
             self.state.player.pauseVideo();
+            if (self.state.onLoadVidTime && self.state.videoPlaying) {
+                self.state.player.playVideo();
+            }
+        };
+
+        this.state = {
+            scriptLoaded: false,
+            videoCued: false,
+            videoPlaying: false,
+            prevYTState: -2,
+            audioValue: 100,
+
+            onLoadVidId: "",
+            onLoadVidTime: 0,
+
+            player: null
         };
 
         var tag = document.createElement('script');
@@ -63,7 +73,12 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
         else throw Error("Unable to add https://www.youtube.com/iframe_api script tag");
 
         window.socket.on('cueVideo', (video_id: string) => {
-            this.setState({ videoCued: false });
+            this.setState({ 
+                videoCued: false,
+                videoPlaying: false,
+                onLoadVidId: "",
+                onLoadVidTime: 0
+            });
             if (this.state.player) {
                 this.state.player.cueVideoById(video_id);
                 this.onReadyFunc();
@@ -98,9 +113,9 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
                     events: {
                         'onReady': this.onReadyFunc,
                         'onStateChange': (event: any) => {
-                            console.log(this.state.prevYTState + " " + event.data);
+                            // console.log(this.state.prevYTState + " " + event.data);
                             if (event.data === this.constants.YTBuffering && this.state.prevYTState === this.constants.YTUnstarted) {
-                                this.state.player.seekTo(0);
+                                this.state.player.seekTo(this.state.onLoadVidTime);
                             }
                             else if (event.data === this.constants.YTBuffering)
                                 this.pauseVideo();
@@ -140,9 +155,11 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
     }
 
     pauseVideo() {
+        var self = this;
         $.ajax({
             url: Constants.baseURL + 'pauseVideo',
-            type: 'POST'
+            type: 'POST',
+            data: { pauseTime: self.state.player.getCurrentTime() }
         });
     }
 
@@ -152,11 +169,29 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
     }
 
     async componentDidMount() {
-        var vidId: string = await $.ajax({
+        var curVid: CurrentVideo = await $.ajax({
             url: Constants.baseURL + 'getCued',
             type: 'GET'
         });
-        this.setState({ onLoadVidId: vidId });
+        var date = curVid!.startTime, pause = curVid!.pauseTime;
+        if (pause && !date) {
+            this.setState({ 
+                onLoadVidTime: Math.round(pause),
+                videoPlaying: curVid.isPlaying as boolean
+            });
+        }
+        else if (date) {
+            var onLoadVidTime = (((new Date()).getTime() - new Date(date).getTime()) / 1000);
+            if (pause) onLoadVidTime += Math.round(pause);
+            this.setState({ 
+                onLoadVidTime: onLoadVidTime + 1.5,// add 1.5 to account for lag, will need a more dynamic number
+                videoPlaying: curVid.isPlaying as boolean
+            });
+        }
+        this.setState({ 
+            onLoadVidId: curVid.cuedVideo
+        });
+        // console.log(this.state.onLoadVidTime)
     }
 
     componentDidUpdate() {
@@ -183,7 +218,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
                     <IconButton disabled={this.state.videoPlaying} onClick={this.playVideo}>
                         <PlayCircleFilled />
                     </IconButton>
-                    <IconButton disabled={!this.state.videoPlaying} onClick={this.pauseVideo}>
+                    <IconButton disabled={!this.state.videoPlaying} onClick={this.pauseVideo.bind(this)}>
                         <PauseCircleFilled />
                     </IconButton>
                     <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue}/>

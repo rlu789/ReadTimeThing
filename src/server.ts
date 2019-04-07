@@ -2,6 +2,7 @@ import secret from "./secret";
 import express = require('express');
 import bodyParser = require('body-parser');
 import cors = require('cors');
+import { CurrentVideo } from "./common/interfaces";
 
 const app: express.Application = express();
 import httpImport = require('http');
@@ -51,20 +52,33 @@ app.delete('/messages', (req, res) => {
   });
 });
 
-var cuedVideo: string;
+var currentVideoInfo: CurrentVideo = {
+  cuedVideo: ""
+};
+
 app.post('/cueVideo', (req, res) => {
   io.emit('cueVideo', req.body.video_id);
-  cuedVideo = req.body.video_id;
+  currentVideoInfo.cuedVideo = req.body.video_id;
+  currentVideoInfo.pauseTime = undefined;
+  currentVideoInfo.startTime = undefined;
+  currentVideoInfo.isPlaying = false;
   res.sendStatus(200);
 });
 app.get('/getCued', (req, res) => {
-  res.status(200).send(cuedVideo);
+  res.status(200).send(currentVideoInfo);
 });
 app.post('/playVideo', (req, res) => {
+  currentVideoInfo.startTime = new Date();
+  currentVideoInfo.isPlaying = true;
+  console.log(currentVideoInfo);
   io.emit('playVideo');
   res.sendStatus(200);
 });
 app.post('/pauseVideo', (req, res) => {
+  currentVideoInfo.isPlaying = false;
+  currentVideoInfo.pauseTime = req.body.pauseTime;
+  currentVideoInfo.startTime = undefined;
+  console.log(currentVideoInfo);
   io.emit('pauseVideo');
   res.sendStatus(200);
 });
