@@ -1,6 +1,7 @@
 import secret from "./secret";
 import express = require('express');
 import bodyParser = require('body-parser');
+import cors = require('cors');
 
 const app: express.Application = express();
 import httpImport = require('http');
@@ -18,6 +19,8 @@ var Message = mongoose.model('Message', new mongoose.Schema({
   message: String,
   createAt: { type: Date, default: Date.now },
 }));
+
+app.use(cors());
 
 app.get('/messages', (req, res) => {
   var conditions = req.query.createAt ? { createAt: { $lt: <Date>req.query.createAt } } : { createAt: { $gte: new Date(2000, 1, 1) } };
@@ -45,9 +48,14 @@ app.delete('/messages', (req, res) => {
   });
 });
 
+var cuedVideo: string;
 app.post('/cueVideo', (req, res) => {
   io.emit('cueVideo', req.body.video_id);
+  cuedVideo = req.body.video_id;
   res.sendStatus(200);
+});
+app.get('/getCued', (req, res) => {
+  res.status(200).send(cuedVideo);
 });
 app.post('/playVideo', (req, res) => {
   io.emit('playVideo');
