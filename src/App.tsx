@@ -132,10 +132,10 @@ function complete() {
             );
         }).catch(err => {
             console.log(err);
-            ReactDOM.render(
-                <App messages={[]} />,
-                document.getElementById("app")
-            );
+            // ReactDOM.render(
+            //     <App messages={[]} />,
+            //     document.getElementById("app")
+            // );
         });
     });
 }

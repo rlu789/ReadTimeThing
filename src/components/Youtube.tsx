@@ -2,6 +2,8 @@ import * as React from "react";
 import { TextField, IconButton } from "@material-ui/core";
 import PlayCircleFilled from "@material-ui/icons/PlayCircleFilled";
 import PauseCircleFilled from "@material-ui/icons/PauseCircleFilled";
+import Slider from '@material-ui/lab/Slider';
+
 import $ = require('jquery');
 import { Constants } from "../common/constants";
 
@@ -15,17 +17,18 @@ interface YoutubeState {
     videoPlaying: boolean;
     onLoadVidId: string;
     prevYTState: number;
+    audioValue: number;
     player: any; // youtube iframe api
 }
 
 export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
+    onReadyFunc: () => void;
     private readonly constants = {
         YTUnstarted: -1,
         YTPlaying: 1,
         YTPasued: 2,
         YTBuffering: 3,
-    }
-    onReadyFunc: () => void;
+    };
 
     constructor(props: YoutubeProps) {
         super(props);
@@ -34,21 +37,23 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
         window.onYouTubeIframeAPIReady = function () {
             self.setState({ scriptLoaded: true });
             window.onYouTubeIframeAPIReady = undefined;
-        }
+        };
+
         this.state = {
             scriptLoaded: false,
             videoCued: false,
             videoPlaying: false,
             onLoadVidId: "",
             prevYTState: -2,
+            audioValue: 100,
             player: null
         };
 
-        this.onReadyFunc = function() {
+        this.onReadyFunc = function () {
             self.setState({ videoCued: true });
             self.state.player.playVideo();
             self.state.player.pauseVideo();
-        }
+        };
 
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -141,6 +146,11 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
         });
     }
 
+    changeAudio(event: React.ChangeEvent<{}>, audioValue: number) {
+        this.setState({ audioValue: audioValue });
+        this.state.player.setVolume(audioValue);
+    }
+
     async componentDidMount() {
         var vidId: string = await $.ajax({
             url: Constants.baseURL + 'getCued',
@@ -169,13 +179,14 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
 
         if (this.state.videoCued) {
             controls = (
-                <div>
+                <div className="youtube-controls">
                     <IconButton disabled={this.state.videoPlaying} onClick={this.playVideo}>
                         <PlayCircleFilled />
                     </IconButton>
                     <IconButton disabled={!this.state.videoPlaying} onClick={this.pauseVideo}>
                         <PauseCircleFilled />
                     </IconButton>
+                    <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue}/>
                 </div>
             );
         }
