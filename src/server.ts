@@ -25,7 +25,10 @@ app.use(cors());
 app.get('/messages', (req, res) => {
   var conditions = req.query.createAt ? { createAt: { $lt: <Date>req.query.createAt } } : { createAt: { $gte: new Date(2000, 1, 1) } };
   Message.find(conditions).sort({ createAt: -1 }).limit(5).exec((err, messages) => {
-    res.send(messages.reverse());
+    if (!err) {
+      res.status(200).send(messages.reverse());
+    }
+    else console.log(err);
   });
 });
 

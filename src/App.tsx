@@ -8,6 +8,7 @@ import { ChatPanel } from "./components/ChatPanel";
 
 // a lot of code below is just copy paste will need tech debt
 import $ = require('jquery');
+import { Constants } from "./common/constants";
 var head = document.getElementsByTagName('head')[0];
 var script: any = document.createElement('script');
 script.type = 'text/javascript';
@@ -80,20 +81,20 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
                 message: this.state.message
             };
             this.setState({ message: '' });
-            $.post('http://localhost:3001/messages', obj);
+            $.post(Constants.baseURL + 'messages', obj);
         }
     }
 
     deleteMessage(i: number) {
         $.ajax({
-            url: 'http://localhost:3001/messages',
+            url: Constants.baseURL + 'messages',
             type: 'DELETE',
             data: this.state.messages[i]
         });
     }
 
     loadMoreMsgs() {
-        $.get('http://localhost:3001/messages', this.state.messages[0], (data: Array<any>) => {
+        $.get(Constants.baseURL + 'messages', this.state.messages[0], (data: Array<any>) => {
             // console.log(data);
             this.setState(state => {
                 const newMsgs = data.concat(state.messages);
@@ -125,9 +126,15 @@ class App extends React.Component<{ messages: Array<any> }, AppState> {
 
 function complete() {
     $(() => {
-        $.get('http://localhost:3001/messages', (data: Array<any>) => {
+        $.get(Constants.baseURL + 'messages', (data: Array<any>) => {
             ReactDOM.render(
                 <App messages={data} />,
+                document.getElementById("app")
+            );
+        }).catch(err => {
+            console.log(err);
+            ReactDOM.render(
+                <App messages={[]} />,
                 document.getElementById("app")
             );
         });

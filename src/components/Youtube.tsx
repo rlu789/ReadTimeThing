@@ -3,6 +3,7 @@ import { TextField, IconButton } from "@material-ui/core";
 import PlayCircleFilled from "@material-ui/icons/PlayCircleFilled";
 import PauseCircleFilled from "@material-ui/icons/PauseCircleFilled";
 import $ = require('jquery');
+import { Constants } from "../common/constants";
 
 interface YoutubeProps {
 
@@ -13,12 +14,15 @@ interface YoutubeState {
     videoCued: boolean;
     videoPlaying: boolean;
     onLoadVidId: string;
+    prevYTState: number;
     player: any; // youtube iframe api
 }
 
 export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
     private readonly constants = {
+        YTUnstarted: -1,
         YTPlaying: 1,
+        YTPasued: 2,
         YTBuffering: 3,
     }
     onReadyFunc: () => void;
@@ -36,6 +40,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
             videoCued: false,
             videoPlaying: false,
             onLoadVidId: "",
+            prevYTState: -2,
             player: null
         };
 
@@ -88,9 +93,13 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
                     events: {
                         'onReady': this.onReadyFunc,
                         'onStateChange': (event: any) => {
-                            console.log(event.data);
-                            if (event.data === this.constants.YTBuffering)
+                            console.log(this.state.prevYTState + " " + event.data);
+                            if (event.data === this.constants.YTBuffering && this.state.prevYTState === this.constants.YTUnstarted) {
+                                this.state.player.seekTo(0);
+                            }
+                            else if (event.data === this.constants.YTBuffering)
                                 this.pauseVideo();
+                            this.setState({ prevYTState: event.data });
                         }
                     }
                 })
@@ -111,7 +120,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
             else video_id = input.value;
 
             $.ajax({
-                url: 'http://localhost:3001/cueVideo',
+                url: Constants.baseURL + 'cueVideo',
                 type: 'POST',
                 data: { video_id: video_id }
             });
@@ -120,21 +129,21 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
 
     playVideo() {
         $.ajax({
-            url: 'http://localhost:3001/playVideo',
+            url: Constants.baseURL + 'playVideo',
             type: 'POST'
         });
     }
 
     pauseVideo() {
         $.ajax({
-            url: 'http://localhost:3001/pauseVideo',
+            url: Constants.baseURL + 'pauseVideo',
             type: 'POST'
         });
     }
 
     async componentDidMount() {
         var vidId: string = await $.ajax({
-            url: 'http://localhost:3001/getCued',
+            url: Constants.baseURL + 'getCued',
             type: 'GET'
         });
         this.setState({ onLoadVidId: vidId });
