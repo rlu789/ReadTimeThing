@@ -19,6 +19,8 @@ interface YoutubeState {
     prevYTState: number;
     audioValue: number;
 
+    preformCatchup: boolean;
+    onLoadStartTime: Date;
     onLoadVidId: string;
     onLoadVidTime: number;
 
@@ -45,10 +47,15 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
 
         this.onReadyFunc = function () {
             self.setState({ videoCued: true });
-            self.state.player.playVideo();
+            self.state.player.seekTo(0);
             self.state.player.pauseVideo();
             if (self.state.onLoadVidTime && self.state.videoPlaying) {
-                self.state.player.playVideo();
+                var seekToTime = self.state.onLoadVidTime + (((new Date).getTime() - self.state.onLoadStartTime.getTime()) / 1000);
+                self.state.player.seekTo(seekToTime + 1);
+                var timeOut = setTimeout(() => {
+                    self.state.player.playVideo();
+                    clearTimeout(timeOut);
+                }, 1000);
             }
         };
 
@@ -59,6 +66,8 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
             prevYTState: -2,
             audioValue: 100,
 
+            preformCatchup: false,
+            onLoadStartTime: new Date(),
             onLoadVidId: "",
             onLoadVidTime: 0,
 
@@ -73,7 +82,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
         else throw Error("Unable to add https://www.youtube.com/iframe_api script tag");
 
         window.socket.on('cueVideo', (video_id: string) => {
-            this.setState({ 
+            this.setState({
                 videoCued: false,
                 videoPlaying: false,
                 onLoadVidId: "",
@@ -115,9 +124,11 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
                         'onStateChange': (event: any) => {
                             // console.log(this.state.prevYTState + " " + event.data);
                             if (event.data === this.constants.YTBuffering && this.state.prevYTState === this.constants.YTUnstarted) {
-                                this.state.player.seekTo(this.state.onLoadVidTime);
+                                if (this.state.onLoadVidTime && this.state.preformCatchup) {
+                                    this.setState({ preformCatchup: false });
+                                }
                             }
-                            else if (event.data === this.constants.YTBuffering)
+                            else if (event.data === this.constants.YTBuffering && !this.state.preformCatchup)
                                 this.pauseVideo();
                             this.setState({ prevYTState: event.data });
                         }
@@ -142,6 +153,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
             $.ajax({
                 url: Constants.baseURL + 'cueVideo',
                 type: 'POST',
+
                 data: { video_id: video_id }
             });
         }
@@ -175,20 +187,20 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
         });
         var date = curVid!.startTime, pause = curVid!.pauseTime;
         if (pause && !date) {
-            this.setState({ 
+            this.setState({
                 onLoadVidTime: Math.round(pause),
                 videoPlaying: curVid.isPlaying as boolean
             });
         }
         else if (date) {
-            var onLoadVidTime = (((new Date()).getTime() - new Date(date).getTime()) / 1000);
+            var onLoadVidTime = Math.round((((new Date()).getTime() - new Date(date).getTime()) / 1000));
             if (pause) onLoadVidTime += Math.round(pause);
-            this.setState({ 
-                onLoadVidTime: onLoadVidTime + 1.5,// add 1.5 to account for lag, will need a more dynamic number
+            this.setState({
+                onLoadVidTime: onLoadVidTime,
                 videoPlaying: curVid.isPlaying as boolean
             });
         }
-        this.setState({ 
+        this.setState({
             onLoadVidId: curVid.cuedVideo
         });
         // console.log(this.state.onLoadVidTime)
@@ -197,7 +209,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
     componentDidUpdate() {
         if (this.state.onLoadVidId && this.state.scriptLoaded) {
             this.initPlayer(this.state.onLoadVidId);
-            this.setState({ onLoadVidId: "", videoCued: true });
+            this.setState({ onLoadVidId: "", videoCued: true, preformCatchup: true });
         }
 
         // TODO fix tab issue
@@ -212,7 +224,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
             element = (<div id="player"></div>);
         }
 
-        if (this.state.videoCued) {
+        if (this.state.videoCued && !this.state.preformCatchup) {
             controls = (
                 <div className="youtube-controls">
                     <IconButton disabled={this.state.videoPlaying} onClick={this.playVideo}>
@@ -221,7 +233,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState>  {
                     <IconButton disabled={!this.state.videoPlaying} onClick={this.pauseVideo.bind(this)}>
                         <PauseCircleFilled />
                     </IconButton>
-                    <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue}/>
+                    <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} />
                 </div>
             );
         }

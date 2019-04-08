@@ -70,6 +70,7 @@ app.get('/getCued', (req, res) => {
 app.post('/playVideo', (req, res) => {
   currentVideoInfo.startTime = new Date();
   currentVideoInfo.isPlaying = true;
+  console.log('/playVideo');
   console.log(currentVideoInfo);
   io.emit('playVideo');
   res.sendStatus(200);
@@ -78,6 +79,7 @@ app.post('/pauseVideo', (req, res) => {
   currentVideoInfo.isPlaying = false;
   currentVideoInfo.pauseTime = req.body.pauseTime;
   currentVideoInfo.startTime = undefined;
+  console.log('/pauseVideo');
   console.log(currentVideoInfo);
   io.emit('pauseVideo');
   res.sendStatus(200);
