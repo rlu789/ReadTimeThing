@@ -2,7 +2,6 @@ import secret from "./secret";
 import express = require('express');
 import bodyParser = require('body-parser');
 import cors = require('cors');
-import { CurrentVideo } from "./common/interfaces";
 
 const app: express.Application = express();
 import httpImport = require('http');
@@ -15,75 +14,13 @@ app.use(express.static("dist"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 
-var Message = mongoose.model('Message', new mongoose.Schema({
-  name: String,
-  message: String,
-  createAt: { type: Date, default: Date.now },
-}));
+// var Message = mongoose.model('Message', new mongoose.Schema({
+//   name: String,
+//   message: String,
+//   createAt: { type: Date, default: Date.now },
+// }));
 
-app.use(cors());
-
-app.get('/messages', (req, res) => {
-  var conditions = req.query.createAt ? { createAt: { $lt: <Date>req.query.createAt } } : { createAt: { $gte: new Date(2000, 1, 1) } };
-  Message.find(conditions).sort({ createAt: -1 }).limit(5).exec((err, messages) => {
-    if (!err) {
-      res.status(200).send(messages.reverse());
-    }
-    else console.log(err);
-  });
-});
-
-app.post('/messages', (req, res) => {
-  var message = new Message(req.body);
-  message.save((err, product) => {
-    if (err)
-      res.sendStatus(500);
-    io.emit('messageAdded', product);
-    res.sendStatus(200);
-  });
-});
-
-app.delete('/messages', (req, res) => {
-  Message.findOneAndDelete(req.body, (err) => {
-    if (err)
-      res.sendStatus(500);
-    io.emit('messageDeleted', req.body);
-    res.sendStatus(200);
-  });
-});
-
-var currentVideoInfo: CurrentVideo = {
-  cuedVideo: ""
-};
-
-app.post('/cueVideo', (req, res) => {
-  io.emit('cueVideo', req.body.video_id);
-  currentVideoInfo.cuedVideo = req.body.video_id;
-  currentVideoInfo.pauseTime = undefined;
-  currentVideoInfo.startTime = undefined;
-  currentVideoInfo.isPlaying = false;
-  res.sendStatus(200);
-});
-app.get('/getCued', (req, res) => {
-  res.status(200).send(currentVideoInfo);
-});
-app.post('/playVideo', (req, res) => {
-  currentVideoInfo.startTime = new Date();
-  currentVideoInfo.isPlaying = true;
-  console.log('/playVideo');
-  console.log(currentVideoInfo);
-  io.emit('playVideo');
-  res.sendStatus(200);
-});
-app.post('/pauseVideo', (req, res) => {
-  currentVideoInfo.isPlaying = false;
-  currentVideoInfo.pauseTime = req.body.pauseTime;
-  currentVideoInfo.startTime = undefined;
-  console.log('/pauseVideo');
-  console.log(currentVideoInfo);
-  io.emit('pauseVideo');
-  res.sendStatus(200);
-});
+// app.use(cors());
 
 io.on('connection', (socket) => {
   console.log('a user is connected')
