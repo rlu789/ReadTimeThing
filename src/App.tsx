@@ -1,9 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { ChangeEvent } from "react";
-import * as SocketIO from "socket.io-client";
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import HomeIcon from '@material-ui/icons/Home';
+import { Lobbies } from "./components/Lobbies";
 
-// a lot of code below is just copy paste will need tech debt
 var head = document.getElementsByTagName('head')[0];
 var script: any = document.createElement('script');
 script.type = 'text/javascript';
@@ -15,7 +17,7 @@ script.onreadystatechange = function () {
 script.onload = complete;
 
 declare global {
-    interface Window { 
+    interface Window {
         socket: SocketIOClient.Socket
     }
 }
@@ -30,8 +32,19 @@ class App extends React.Component<{}, {}> {
 
     render() {
         return (
-            <div className="container-fluid">
-                test
+            <div>
+                <AppBar position="static">
+                    <Toolbar>
+                        <IconButton color="inherit" aria-label="menu">
+                            <HomeIcon></HomeIcon>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+                <div className="container">
+                    <div className="row">
+                        <Lobbies></Lobbies>
+                    </div>
+                </div>
             </div>
         );
     }
