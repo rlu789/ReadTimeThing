@@ -10,10 +10,12 @@ import ioImport = require('socket.io');
 var io = ioImport(http);
 
 import mongoose = require('mongoose');
-app.use(express.static("dist"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }))
+import * as path from 'path';
 
+app.use(express.static("dist"));
+app.use("/test/*", express.static("dist"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 // var Message = mongoose.model('Message', new mongoose.Schema({
 //   name: String,
 //   message: String,

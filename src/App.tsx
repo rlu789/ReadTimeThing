@@ -4,7 +4,10 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
+import Book from '@material-ui/icons/Book';
 import { Lobbies } from "./components/Lobbies";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Test } from "./components/Test";
 
 var head = document.getElementsByTagName('head')[0];
 var script: any = document.createElement('script');
@@ -32,19 +35,28 @@ class App extends React.Component<{}, {}> {
 
     render() {
         return (
-            <div>
-                <AppBar position="static">
-                    <Toolbar>
-                        <IconButton color="inherit" aria-label="menu">
-                            <HomeIcon></HomeIcon>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <div className="container">
-                    <div className="row">
-                        <Lobbies></Lobbies>
-                    </div>
-                </div>
+            <div className="app">
+                <Router>
+                    <AppBar position="static">
+                        <Toolbar>
+                            <Link to="/">
+                                <IconButton color="inherit">
+                                    <HomeIcon>
+                                    </HomeIcon>
+                                </IconButton>
+                            </Link>
+                            <Link to="/test/1">
+                                <IconButton color="inherit">
+                                    <Book>
+                                    </Book>
+                                </IconButton>
+                            </Link>
+                        </Toolbar>
+                    </AppBar>
+
+                    <Route path="/" exact component={Lobbies} />
+                    <Route path="/test/:id" component={Test} />
+                </Router>
             </div>
         );
     }

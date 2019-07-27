@@ -37,15 +37,19 @@ export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
 
     render() {
         return (
-            <Paper className="lobbies">
-                <Typography variant="h5" component="h2">
-                    Lobbies
+        <div className="container">
+            <div className="row">
+                <Paper className="lobbies">
+                    <Typography variant="h5" component="h2">
+                        Lobbies
                     <IconButton color="primary" onClick={this.addLobby.bind(this)}>
-                        <AddIcon />
-                    </IconButton >
-                </Typography>
-                <LobbiesAdd open={this.state.open} handleClose={this.handleClose.bind(this)}></LobbiesAdd>
-            </Paper>
+                            <AddIcon />
+                        </IconButton >
+                    </Typography>
+                    <LobbiesAdd open={this.state.open} handleClose={this.handleClose.bind(this)}></LobbiesAdd>
+                </Paper>
+            </div>
+            </div>
         );
     }
 }
