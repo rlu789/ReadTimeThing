@@ -6,13 +6,15 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { LobbyReq } from '../_backend/lobby';
 
 interface LobbiesAddProps {
     open: boolean;
-    handleClose: (lobbyName?: string) => void;
+    handleClose: (lReq?: LobbyReq) => void;
 }
 interface LobbiesAddState {
     lobbyName: string
+    lobbyDesc: string
 }
 
 export class LobbiesAdd extends React.Component<LobbiesAddProps, LobbiesAddState> {
@@ -20,7 +22,8 @@ export class LobbiesAdd extends React.Component<LobbiesAddProps, LobbiesAddState
         super(props);
 
         this.state = {
-            lobbyName: ""
+            lobbyName: "",
+            lobbyDesc: ""
         }
     }
 
@@ -32,11 +35,16 @@ export class LobbiesAdd extends React.Component<LobbiesAddProps, LobbiesAddState
         }))
     }
     
-
+    createReqObject(): LobbyReq {
+        return {
+            name: this.state.lobbyName,
+            description: this.state.lobbyDesc
+        }
+    }
 
     render() {
         return (
-            <Dialog fullWidth={true} maxWidth="md" onExited={() => {this.setState({lobbyName: ""})}} open={this.props.open} onClose={this.props.handleClose.bind(undefined, this.state.lobbyName)}>
+            <Dialog fullWidth={true} maxWidth="md" onExited={() => {this.setState({lobbyName: "", lobbyDesc: ""})}} open={this.props.open} onClose={this.props.handleClose.bind(undefined, this.createReqObject())}>
                 <DialogTitle id="form-dialog-title">Add Lobby</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -51,12 +59,20 @@ export class LobbiesAdd extends React.Component<LobbiesAddProps, LobbiesAddState
                         type="text"
                         fullWidth
                     />
+                    <TextField
+                        margin="dense"
+                        label="Lobby Description"
+                        value={this.state.lobbyDesc}
+                        onChange={(e) => this.handleChange("lobbyDesc", e)}
+                        type="text"
+                        fullWidth
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.props.handleClose.bind(undefined, undefined)} color="primary">
                         Cancel
           </Button>
-                    <Button onClick={this.props.handleClose.bind(undefined, this.state.lobbyName)} color="primary">
+                    <Button onClick={this.props.handleClose.bind(undefined, this.createReqObject())} color="primary">
                         Add
           </Button>
                 </DialogActions>

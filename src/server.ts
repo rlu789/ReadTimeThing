@@ -11,18 +11,12 @@ var io = ioImport(http);
 
 import mongoose = require('mongoose');
 import * as path from 'path';
+import { Lobby } from "./_backend/lobby";
 
 app.use(express.static("dist"));
 app.use("/test/*", express.static("dist"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// var Message = mongoose.model('Message', new mongoose.Schema({
-//   name: String,
-//   message: String,
-//   createAt: { type: Date, default: Date.now },
-// }));
-
-// app.use(cors());
 
 io.on('connection', (socket) => {
   console.log('a user is connected')
@@ -30,6 +24,9 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 });
+
+Lobby.init(app, io);
+
 mongoose.connect(secret.privateDbUrl, { useNewUrlParser: true }, (err) => {
   console.log('mongodb connected', err);
 });

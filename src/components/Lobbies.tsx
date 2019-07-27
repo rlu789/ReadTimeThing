@@ -3,14 +3,17 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
-import Dialog from '@material-ui/core/Dialog';
 import { LobbiesAdd } from "./LobbiesAdd";
+import { ILobby, LobbyReq } from "../_backend/lobby";
+import $ = require('jquery');
+import { LobbiesCard } from "./LobbiesCard";
 
 interface LobbiesProps {
 
 }
 interface LobbiesState {
-    open: boolean;
+    modalOpen: boolean;
+    lobbies?: ILobby[];
 }
 
 export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
@@ -18,37 +21,58 @@ export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
         super(props);
 
         this.state = {
-            open: false
+            modalOpen: false
         }
+
+        $.get("/lobbies").then((res) => {
+            this.setState({ lobbies: res });
+        })
+
+        window.socket.on('lobbyAdded', (lobby: ILobby) => {
+            this.setState(state => {
+                var arr = state.lobbies;
+                if (!arr) arr = [];
+                arr.unshift(lobby);
+                console.log(arr);
+                return {
+                    lobbies: arr
+                }
+            })
+        })
     }
 
-    handleClose(lobbyName?: string) {
-        console.log(lobbyName);
+    handleClose(lReq?: LobbyReq) {
         this.setState({
-            open: false
+            modalOpen: false
         });
+        if (lReq) {
+            $.post("/lobby", lReq);
+        }
     }
 
     addLobby() {
         this.setState({
-            open: true
+            modalOpen: true
         });
     }
 
     render() {
         return (
-        <div className="container">
-            <div className="row">
-                <Paper className="lobbies">
-                    <Typography variant="h5" component="h2">
-                        Lobbies
-                    <IconButton color="primary" onClick={this.addLobby.bind(this)}>
-                            <AddIcon />
-                        </IconButton >
-                    </Typography>
-                    <LobbiesAdd open={this.state.open} handleClose={this.handleClose.bind(this)}></LobbiesAdd>
-                </Paper>
-            </div>
+            <div className="container">
+                <div className="row">
+                    <Paper className="lobbies">
+                        <Typography variant="h5" component="h2">
+                            Lobbies
+                            <IconButton color="primary" onClick={this.addLobby.bind(this)}>
+                                <AddIcon />
+                            </IconButton >
+                        </Typography>
+                        <LobbiesAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbiesAdd>
+                        {this.state.lobbies ? (this.state.lobbies.map((l) => {
+                            return <LobbiesCard lobbyModel={l}></LobbiesCard>
+                        })) : <div>Loading</div>}
+                    </Paper>
+                </div>
             </div>
         );
     }
