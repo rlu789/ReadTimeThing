@@ -5,9 +5,11 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { ILobby } from "../_backend/lobby";
+import { History } from "history";
 
 interface LobbiesCardProps {
     lobbyModel: ILobby;
+    history: History;
 }
 interface LobbiesCardState {
 }
@@ -15,6 +17,10 @@ interface LobbiesCardState {
 export class LobbiesCard extends React.Component<LobbiesCardProps, LobbiesCardState> {
     constructor(props: LobbiesCardProps) {
         super(props);
+    }
+
+    joinRoom(roomId: string) {
+        this.props.history.push("/room/" + roomId);
     }
 
     render() {
@@ -30,9 +36,12 @@ export class LobbiesCard extends React.Component<LobbiesCardProps, LobbiesCardSt
                             {l.description}
                         </Typography>) :
                         undefined}
+                    <Typography variant="body2" component="p">
+                        No of ppl: {l.guests}
+                    </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small" color="primary">Join</Button>
+                    <Button size="small" color="primary" onClick={() => { this.joinRoom(l._id) }}>Join</Button>
                 </CardActions>
             </Card>
         );

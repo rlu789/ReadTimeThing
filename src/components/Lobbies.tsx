@@ -7,8 +7,9 @@ import { LobbiesAdd } from "./LobbiesAdd";
 import { ILobby, LobbyReq } from "../_backend/lobby";
 import $ = require('jquery');
 import { LobbiesCard } from "./LobbiesCard";
+import { RouteComponentProps } from "react-router-dom";
 
-interface LobbiesProps {
+interface LobbiesProps extends RouteComponentProps {
 
 }
 interface LobbiesState {
@@ -19,14 +20,15 @@ interface LobbiesState {
 export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
     constructor(props: LobbiesProps) {
         super(props);
+        // console.log(this.props);
 
         this.state = {
             modalOpen: false
-        }
+        };
 
         $.get("/lobbies").then((res) => {
             this.setState({ lobbies: res });
-        })
+        });
 
         window.socket.on('lobbyAdded', (lobby: ILobby) => {
             this.setState(state => {
@@ -36,9 +38,9 @@ export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
                 console.log(arr);
                 return {
                     lobbies: arr
-                }
-            })
-        })
+                };
+            });
+        });
     }
 
     handleClose(lReq?: LobbyReq) {
@@ -69,7 +71,7 @@ export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
                         </Typography>
                         <LobbiesAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbiesAdd>
                         {this.state.lobbies ? (this.state.lobbies.map((l) => {
-                            return <LobbiesCard lobbyModel={l}></LobbiesCard>
+                            return <LobbiesCard lobbyModel={l} history={this.props.history}></LobbiesCard>
                         })) : <div>Loading</div>}
                     </Paper>
                 </div>

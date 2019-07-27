@@ -14,18 +14,22 @@ import * as path from 'path';
 import { Lobby } from "./_backend/lobby";
 
 app.use(express.static("dist"));
-app.use("/test/*", express.static("dist"));
+app.use("/room/*", express.static("dist"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+Lobby.init(app, io);
+
 io.on('connection', (socket) => {
   console.log('a user is connected')
+  socket.on('subscribe', function(roomId: string) { 
+    socket.join(roomId);
+    console.log(roomId);
+  })
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
 });
-
-Lobby.init(app, io);
 
 mongoose.connect(secret.privateDbUrl, { useNewUrlParser: true }, (err) => {
   console.log('mongodb connected', err);
