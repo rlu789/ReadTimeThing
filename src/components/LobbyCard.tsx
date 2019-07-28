@@ -23,7 +23,7 @@ export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
         this.state = {
             guests: this.props.roomModel.guests
         };
-        
+
         window.socket.on(this.props.roomModel._id + 'GuestUpdate', (update: { clients: [] }) => {
             this.setState({
                 guests: update.clients.length

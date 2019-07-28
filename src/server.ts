@@ -24,11 +24,11 @@ io.on('connection', (socket) => {
   console.log('a user is connected')
   socket.on('subscribe', function(roomId: string) { 
     socket.join(roomId);
-    // console.log(roomId);
 
     io.in(roomId).clients((error: any, clients: []) => {
       if (error) throw error;
       // console.log(clients);
+      // console.log(roomId);
       io.emit(roomId + 'GuestUpdate', { clients: clients });
     });
   });

@@ -31,15 +31,14 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
         });
 
         window.socket.on('roomAdded', (lobby: IRoom) => {
-            this.setState(state => {
-                var arr = state.rooms;
-                if (!arr) arr = [];
-                arr.unshift(lobby);
-                // console.log(arr);
-                return {
-                    rooms: arr
-                };
-            });
+            var roomState = this.state.rooms;
+            if (!roomState) roomState = [];
+            roomState.unshift(lobby);
+
+            // hard reset rooms array
+            // because of issues where when you add a room, other clients see the added room but the no of ppl is bugged
+            this.setState({rooms: []}); 
+            this.setState({rooms: roomState});
         });
     }
 
@@ -48,7 +47,9 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
             modalOpen: false
         });
         if (lReq) {
-            $.post("/addRoom", lReq);
+            $.post("/addRoom", lReq).then((room: IRoom) => {
+                this.props.history.push("/room/" + room._id);
+            });
         }
     }
 
