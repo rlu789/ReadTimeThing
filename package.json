@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "parcel build src/index.html && ts-node-dev --respawn --transpileOnly ./src/server.ts ",
-    "prod": "parcel build src/index.html && tsc && node ./dist/server.js",
+    "start": "parcel build src/index.html && tsc && node ./dist/server.js",
     "react": "parcel build src/index.html"
   },
   "author": "",
