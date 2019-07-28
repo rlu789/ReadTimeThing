@@ -12,6 +12,7 @@ var io = ioImport(http);
 import mongoose = require('mongoose');
 import * as path from 'path';
 import { Room } from "./_backend/room";
+import { ClientManager } from "./_backend/clientManager";
 
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
@@ -19,33 +20,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 var RoomModel = new Room(app, io);
+var Clients = new ClientManager(app, io, RoomModel);
 
 io.on('connection', (socket) => {
-  console.log('a user is connected')
-  socket.on('subscribe', function(roomId: string) { 
-    socket.join(roomId);
-
-    io.in(roomId).clients((error: any, clients: []) => {
-      if (error) throw error;
-      // console.log(clients);
-      // console.log(roomId);
-      io.emit(roomId + 'GuestUpdate', { clients: clients });
-    });
-  });
-
-  socket.on('unsubscribe', function(roomId: string) { 
-    socket.leave(roomId);
-
-    io.in(roomId).clients((error: any, clients: []) => {
-      if (error) throw error;
-      io.emit(roomId + 'GuestUpdate', { clients: clients });
-    });
-  });
-
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-    // socket.leaveAll();
-  });
+  Clients.newClient(socket);
 });
 
 mongoose.connect(secret.privateDbUrl, { useNewUrlParser: true }, (err) => {

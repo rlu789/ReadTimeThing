@@ -21,6 +21,7 @@ export class Room {
         guests: { type: Number, default: 0 },
         createAt: { type: Date, default: Date.now },
     }));
+
     constructor(public app: express.Application, public io: ioImport.Server) {
         app.get('/allRooms', (req, res) => {
             this.Model.find().sort({ createAt: -1 }).exec((err, rooms) => {
@@ -55,5 +56,12 @@ export class Room {
                 io.emit('roomAdded', product);
             });
         });
+    }
+
+    removeRoom (id: string) {
+        this.Model.findByIdAndDelete({ _id: id }, (err, res) => {
+            if (err) throw err;
+        });
+        this.io.emit('roomRemoved', id);
     }
 }

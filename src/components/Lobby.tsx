@@ -40,6 +40,15 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
             this.setState({rooms: []}); 
             this.setState({rooms: roomState});
         });
+
+        window.socket.on('roomRemoved', (roomId: string) => {
+            var roomState = this.state.rooms;
+            if (roomState) {
+                var newState = roomState.filter(r => r._id !== roomId);
+                this.setState({rooms: []}); 
+                this.setState({rooms: newState});
+            }
+        });
     }
 
     handleClose(lReq?: RoomReq) {
