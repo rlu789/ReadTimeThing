@@ -15,6 +15,12 @@ export class Room extends React.Component<RoomProps, RoomState> {
         console.log(routeParams.id);
         window.socket.emit('subscribe', routeParams.id);
     }
+
+    componentWillUnmount(){
+        var routeParams: any = (this.props.match.params);
+        window.socket.emit('unsubscribe', routeParams.id);
+    }
+
     render() {
         return (
             <div className="container">

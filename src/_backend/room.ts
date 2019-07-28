@@ -14,27 +14,37 @@ export interface IRoom {
     _id: string;
 }
 
-// room ~= lobby ????
-export class Lobby {
-    public static init(app: express.Application, io: ioImport.Server) {
-        var Room = mongoose.model('Lobby', new mongoose.Schema({
-            name: String,
-            description: String,
-            guests: { type: Number, default: 0 },
-            createAt: { type: Date, default: Date.now },
-        }));
-
+export class Room {
+    public Model = mongoose.model('Room', new mongoose.Schema({
+        name: String,
+        description: String,
+        guests: { type: Number, default: 0 },
+        createAt: { type: Date, default: Date.now },
+    }));
+    constructor(public app: express.Application, public io: ioImport.Server) {
         app.get('/allRooms', (req, res) => {
-            Room.find().sort({ createAt: -1 }).exec((err, rooms) => {
+            this.Model.find().sort({ createAt: -1 }).exec((err, rooms) => {
                 if (!err) {
-                    res.status(200).send(rooms);
+                    for (let i = 0; i < rooms.length; i++) {
+                        io.in(rooms[i].id).clients((error: any, clients: []) => {
+                            if (error) throw error;
+                            rooms[i].set("guests", clients.length);
+
+                            // some async issues happening with .clients()
+                            // need to return response after guests has been set within this for loop
+                            // very hacky fix
+                            if (i === rooms.length - 1) {
+                                res.status(200).send(rooms);
+                            }
+                        });
+                    }
                 }
                 else console.log(err);
             });
         });
 
         app.post('/addRoom', (req, res) => {
-            var room = new Room(req.body);
+            var room = new this.Model(req.body);
             room.save((err, product) => {
                 if (err)
                     res.sendStatus(500);

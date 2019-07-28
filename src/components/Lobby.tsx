@@ -35,7 +35,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
                 var arr = state.rooms;
                 if (!arr) arr = [];
                 arr.unshift(lobby);
-                console.log(arr);
+                // console.log(arr);
                 return {
                     rooms: arr
                 };
@@ -71,7 +71,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
                         </Typography>
                         <LobbyAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbyAdd>
                         {this.state.rooms ? (this.state.rooms.map((r) => {
-                            return <LobbyCard lobbyModel={r} history={this.props.history}></LobbyCard>
+                            return <LobbyCard roomModel={r} history={this.props.history}></LobbyCard>
                         })) : <div>Loading</div>}
                     </Paper>
                 </div>

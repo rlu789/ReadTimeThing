@@ -8,15 +8,27 @@ import { IRoom } from "../_backend/room";
 import { History } from "history";
 
 interface LobbyCardProps {
-    lobbyModel: IRoom;
+    roomModel: IRoom;
     history: History;
 }
 interface LobbyCardState {
+    guests: number;
 }
 
 export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
     constructor(props: LobbyCardProps) {
         super(props);
+
+        var self = this;
+        this.state = {
+            guests: this.props.roomModel.guests
+        };
+        
+        window.socket.on(this.props.roomModel._id + 'GuestUpdate', (update: { clients: [] }) => {
+            this.setState({
+                guests: update.clients.length
+            });
+        });
     }
 
     joinRoom(roomId: string) {
@@ -24,7 +36,7 @@ export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
     }
 
     render() {
-        var l = this.props.lobbyModel;
+        var l = this.props.roomModel;
         return (
             <Card className="lobby-card">
                 <CardContent>
@@ -37,7 +49,7 @@ export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
                         </Typography>) :
                         undefined}
                     <Typography variant="body2" component="p">
-                        No of ppl: {l.guests}
+                        No of ppl: {this.state.guests}
                     </Typography>
                 </CardContent>
                 <CardActions>
