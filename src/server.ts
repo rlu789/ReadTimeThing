@@ -11,7 +11,7 @@ var io = ioImport(http);
 
 import mongoose = require('mongoose');
 import * as path from 'path';
-import { Lobby } from "./_backend/lobby";
+import { Lobby } from "./_backend/room";
 
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
@@ -25,9 +25,15 @@ io.on('connection', (socket) => {
   socket.on('subscribe', function(roomId: string) { 
     socket.join(roomId);
     console.log(roomId);
+
+    io.in(roomId).clients((error: any, clients: []) => {
+      if (error) throw error;
+      console.log(clients);
+    });
   })
   socket.on('disconnect', function(){
     console.log('user disconnected');
+    socket.leaveAll();
   });
 });
 

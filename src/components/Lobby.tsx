@@ -3,22 +3,22 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
-import { LobbiesAdd } from "./LobbiesAdd";
-import { ILobby, LobbyReq } from "../_backend/lobby";
+import { LobbyAdd } from "./LobbyAdd";
+import { IRoom, RoomReq } from "../_backend/room";
 import $ = require('jquery');
-import { LobbiesCard } from "./LobbiesCard";
+import { LobbyCard } from "./LobbyCard";
 import { RouteComponentProps } from "react-router-dom";
 
-interface LobbiesProps extends RouteComponentProps {
+interface LobbyProps extends RouteComponentProps {
 
 }
-interface LobbiesState {
+interface LobbyState {
     modalOpen: boolean;
-    lobbies?: ILobby[];
+    rooms?: IRoom[];
 }
 
-export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
-    constructor(props: LobbiesProps) {
+export class Lobby extends React.Component<LobbyProps, LobbyState> {
+    constructor(props: LobbyProps) {
         super(props);
         // console.log(this.props);
 
@@ -26,29 +26,29 @@ export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
             modalOpen: false
         };
 
-        $.get("/lobbies").then((res) => {
-            this.setState({ lobbies: res });
+        $.get("/allRooms").then((res) => {
+            this.setState({ rooms: res });
         });
 
-        window.socket.on('lobbyAdded', (lobby: ILobby) => {
+        window.socket.on('roomAdded', (lobby: IRoom) => {
             this.setState(state => {
-                var arr = state.lobbies;
+                var arr = state.rooms;
                 if (!arr) arr = [];
                 arr.unshift(lobby);
                 console.log(arr);
                 return {
-                    lobbies: arr
+                    rooms: arr
                 };
             });
         });
     }
 
-    handleClose(lReq?: LobbyReq) {
+    handleClose(lReq?: RoomReq) {
         this.setState({
             modalOpen: false
         });
         if (lReq) {
-            $.post("/lobby", lReq);
+            $.post("/addRoom", lReq);
         }
     }
 
@@ -62,16 +62,16 @@ export class Lobbies extends React.Component<LobbiesProps, LobbiesState> {
         return (
             <div className="container">
                 <div className="row">
-                    <Paper className="lobbies">
+                    <Paper className="lobby">
                         <Typography variant="h5" component="h2">
-                            Lobbies
+                            Rooms
                             <IconButton color="primary" onClick={this.addLobby.bind(this)}>
                                 <AddIcon />
                             </IconButton >
                         </Typography>
-                        <LobbiesAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbiesAdd>
-                        {this.state.lobbies ? (this.state.lobbies.map((l) => {
-                            return <LobbiesCard lobbyModel={l} history={this.props.history}></LobbiesCard>
+                        <LobbyAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbyAdd>
+                        {this.state.rooms ? (this.state.rooms.map((r) => {
+                            return <LobbyCard lobbyModel={r} history={this.props.history}></LobbyCard>
                         })) : <div>Loading</div>}
                     </Paper>
                 </div>

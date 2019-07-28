@@ -4,7 +4,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
-import { Lobbies } from "./components/Lobbies";
+import { Lobby } from "./components/Lobby";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Room } from "./components/Room";
 
@@ -53,7 +53,7 @@ class App extends React.Component<{}, {}> {
                         </Toolbar>
                     </AppBar>
 
-                    <Route path="/" exact component={Lobbies} />
+                    <Route path="/" exact component={Lobby} />
                     <Route path="/room/:id" component={Room} />
                 </Router>
             </div>

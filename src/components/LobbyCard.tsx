@@ -4,18 +4,18 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { ILobby } from "../_backend/lobby";
+import { IRoom } from "../_backend/room";
 import { History } from "history";
 
-interface LobbiesCardProps {
-    lobbyModel: ILobby;
+interface LobbyCardProps {
+    lobbyModel: IRoom;
     history: History;
 }
-interface LobbiesCardState {
+interface LobbyCardState {
 }
 
-export class LobbiesCard extends React.Component<LobbiesCardProps, LobbiesCardState> {
-    constructor(props: LobbiesCardProps) {
+export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
+    constructor(props: LobbyCardProps) {
         super(props);
     }
 
@@ -26,7 +26,7 @@ export class LobbiesCard extends React.Component<LobbiesCardProps, LobbiesCardSt
     render() {
         var l = this.props.lobbyModel;
         return (
-            <Card className="lobbies-card">
+            <Card className="lobby-card">
                 <CardContent>
                     <Typography variant="h5" component="h2">
                         {l.name}

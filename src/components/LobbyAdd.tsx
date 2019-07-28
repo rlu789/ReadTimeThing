@@ -6,19 +6,19 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { LobbyReq } from '../_backend/lobby';
+import { RoomReq } from '../_backend/room';
 
-interface LobbiesAddProps {
+interface LobbyAddProps {
     open: boolean;
-    handleClose: (lReq?: LobbyReq) => void;
+    handleClose: (lReq?: RoomReq) => void;
 }
-interface LobbiesAddState {
+interface LobbyAddState {
     lobbyName: string
     lobbyDesc: string
 }
 
-export class LobbiesAdd extends React.Component<LobbiesAddProps, LobbiesAddState> {
-    constructor(props: LobbiesAddProps) {
+export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
+    constructor(props: LobbyAddProps) {
         super(props);
 
         this.state = {
@@ -35,7 +35,7 @@ export class LobbiesAdd extends React.Component<LobbiesAddProps, LobbiesAddState
         }))
     }
     
-    createReqObject(): LobbyReq {
+    createReqObject(): RoomReq {
         return {
             name: this.state.lobbyName,
             description: this.state.lobbyDesc
