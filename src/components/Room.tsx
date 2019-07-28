@@ -5,18 +5,27 @@ interface RoomProps extends RouteComponentProps {
 
 }
 interface RoomState {
+    clients: []
 }
 
 export class Room extends React.Component<RoomProps, RoomState> {
     constructor(props: RoomProps) {
         super(props);
 
+        this.state = {
+            clients: []
+        };
+
         var routeParams: any = (this.props.match.params);
-        console.log(routeParams.id);
         window.socket.emit('subscribe', routeParams.id);
+        window.socket.on(routeParams.id + 'GuestUpdate', (update: { clients: [] }) => {
+            this.setState({
+                clients: update.clients
+            });
+        });
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         var routeParams: any = (this.props.match.params);
         window.socket.emit('unsubscribe', routeParams.id);
     }
@@ -24,9 +33,10 @@ export class Room extends React.Component<RoomProps, RoomState> {
     render() {
         return (
             <div className="container">
-                <div className="row">
-                    hello there
-                </div>
+                <p>hello there: </p>
+                {this.state.clients.map((c) => {
+                    return <p>{c}</p>
+                })}
             </div>
         );
     }
