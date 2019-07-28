@@ -3,31 +3,44 @@ import ioImport = require('socket.io');
 import mongoose = require('mongoose');
 import { Room } from './room';
 
-interface ClientData {
+export interface ClientData {
     rooms: { [key: string]: string };
+    name: string;
 }
 
 export class ClientManager {
     public clients: { [key: string]: ClientData } = {};
+    public count = 0;
 
     constructor(public app: express.Application, public io: ioImport.Server, public roomModel: Room) {
-
+        this.app.get("/user", (req, res) => {
+            res.status(200).send(this.clients[req.query.id]);
+        });
+        this.app.post("/user", (req, res) => {
+            this.clients[req.body.id].name = req.body.name;
+            res.sendStatus(200);
+        });
     }
 
     private updateGuestCount(roomId: string) {
-        this.io.in(roomId).clients((error: any, clients: []) => {
+        this.io.in(roomId).clients((error: any, roomClients: []) => {
             if (error) throw error;
-            if (clients.length === 0)
+            if (roomClients.length === 0)
                 this.roomModel.removeRoom(roomId);
-            else
-                this.io.emit(roomId + 'GuestUpdate', { clients: clients });
+            else {
+                var clientsName = roomClients.map((c) => {
+                    return this.clients[c].name;
+                });
+                this.io.emit(roomId + 'GuestUpdate', { clients: clientsName });
+            }
         });
     }
 
     public newClient(socket: ioImport.Socket) {
         var self = this;
         this.clients[socket.id] = {
-            rooms: {}
+            rooms: {},
+            name: "Guest-" + self.count++
         };
 
         console.log('a user is connected');
@@ -35,10 +48,7 @@ export class ClientManager {
             socket.join(roomId);
             self.clients[socket.id].rooms[roomId] = roomId;
 
-            self.io.in(roomId).clients((error: any, clients: []) => {
-                if (error) throw error;
-                self.io.emit(roomId + 'GuestUpdate', { clients: clients });
-            });
+            self.updateGuestCount(roomId);
         });
 
         socket.on('unsubscribe', function (roomId: string) {
@@ -53,8 +63,9 @@ export class ClientManager {
 
             Object.keys(self.clients[socket.id].rooms).forEach(roomId => {
                 self.updateGuestCount(roomId);
-            })
-
+            });
+            
+            delete self.clients[socket.id];
         });
     }
 }

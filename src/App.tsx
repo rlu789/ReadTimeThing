@@ -7,6 +7,9 @@ import HomeIcon from '@material-ui/icons/Home';
 import { Lobby } from "./components/Lobby";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Room } from "./components/Room";
+import stateManager from "./utils/state";
+import $ = require('jquery');
+import { ClientData } from "./_backend/clientManager";
 
 var head = document.getElementsByTagName('head')[0];
 var script: any = document.createElement('script');
@@ -20,7 +23,7 @@ script.onload = complete;
 
 declare global {
     interface Window {
-        socket: SocketIOClient.Socket
+        socket: SocketIOClient.Socket;
     }
 }
 
@@ -28,8 +31,6 @@ class App extends React.Component<{}, {}> {
     constructor(props: {}) {
         super(props);
         this.state = {};
-
-        window.socket = io();
     }
 
     render() {
@@ -44,12 +45,6 @@ class App extends React.Component<{}, {}> {
                                     </HomeIcon>
                                 </IconButton>
                             </Link>
-                            {/* <Link to="/test/1">
-                                <IconButton color="inherit">
-                                    <Book>
-                                    </Book>
-                                </IconButton>
-                            </Link> */}
                         </Toolbar>
                     </AppBar>
 
@@ -62,8 +57,15 @@ class App extends React.Component<{}, {}> {
 }
 
 function complete() {
-    ReactDOM.render(
-        <App />,
-        document.getElementById("app")
-    );
+    window.socket = io();
+    window.socket.on('connect', function () {
+        // window.socket.id exists after the connect event
+        $.get("/user", { id: window.socket.id }, (res: ClientData) => {
+            stateManager.set("user", res.name);
+            ReactDOM.render(
+                <App />,
+                document.getElementById("app")
+            );
+        });
+    });
 }
