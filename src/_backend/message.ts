@@ -2,6 +2,12 @@ import express = require('express');
 import ioImport = require('socket.io');
 import mongoose = require('mongoose');
 
+export interface MessageReq {
+    author: string;
+    message: string;
+    roomId: string;
+}
+
 export interface IMessage {
     author: string;
     message: string;
@@ -19,6 +25,7 @@ export class Message {
 
     constructor(public app: express.Application, public io: ioImport.Server) {
         app.get("/messages", (req, res) => {
+            // console.log(req.query.roomId)
             this.Model.find({
                 roomId: req.query.roomId
             }).sort({ createAt: -1 }).exec((err, messages) => {

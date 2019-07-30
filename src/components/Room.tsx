@@ -6,19 +6,22 @@ interface RoomProps extends RouteComponentProps {
 
 }
 interface RoomState {
-    clients: {[key: string]: string}
+    clients: {[key: string]: string};
+    roomId: string;
 }
 
 export class Room extends React.Component<RoomProps, RoomState> {
     constructor(props: RoomProps) {
         super(props);
 
-        this.state = {
-            clients: {}
-        };
-
         var routeParams: any = (this.props.match.params);
         window.socket.emit('subscribe', routeParams.id);
+
+        this.state = {
+            clients: {},
+            roomId: routeParams.id
+        };
+
         window.socket.on(routeParams.id + 'GuestUpdate', (update: { clients: {[key: string]: string} }) => {
             this.setState({
                 clients: update.clients
@@ -41,7 +44,7 @@ export class Room extends React.Component<RoomProps, RoomState> {
                             return <p>{this.state.clients[c]}</p>
                         })}</div>
                     <div className="col-4">
-                        <ChatPanel></ChatPanel>
+                        <ChatPanel roomId={this.state.roomId} clients={this.state.clients}></ChatPanel>
                     </div>
                 </div>
             </div>

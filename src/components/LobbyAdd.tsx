@@ -31,8 +31,8 @@ export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
         var v = event.currentTarget.value;
         this.setState(prevState => ({
             ...prevState,
-            [key]: v,
-        }))
+            [key]: v
+        }));
     }
     
     createReqObject(): RoomReq {

@@ -14,6 +14,7 @@ import * as path from 'path';
 import { Room } from "./_backend/room";
 import { ClientManager } from "./_backend/clientManager";
 import { Message } from "./_backend/message";
+import { RoomManager } from "./_backend/roomManager";
 
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
@@ -22,7 +23,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 var RoomModel = new Room(app, io);
 var MessageModel = new Message(app, io);
-var Clients = new ClientManager(app, io, RoomModel);
+var Rooms = new RoomManager(app, io, RoomModel, MessageModel);
+var Clients = new ClientManager(app, io, Rooms);
 
 io.on('connection', (socket) => {
   Clients.newClient(socket);

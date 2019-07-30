@@ -1,7 +1,7 @@
 import express = require('express');
 import ioImport = require('socket.io');
 import mongoose = require('mongoose');
-import { Room } from './room';
+import { RoomManager } from './roomManager';
 
 export interface ClientData {
     rooms: { [key: string]: string };
@@ -12,7 +12,7 @@ export class ClientManager {
     public clients: { [key: string]: ClientData } = {};
     public count = 0;
 
-    constructor(public app: express.Application, public io: ioImport.Server, public roomModel: Room) {
+    constructor(public app: express.Application, public io: ioImport.Server, public roomManager: RoomManager) {
         this.app.get("/user", (req, res) => {
             res.status(200).send(this.clients[req.query.id]);
         });
@@ -26,7 +26,7 @@ export class ClientManager {
         this.io.in(roomId).clients((error: any, roomClients: []) => {
             if (error) console.log(error);
             if (roomClients.length === 0)
-                this.roomModel.removeRoom(roomId);
+                this.roomManager.removeRoom(roomId);
             else {
                 // var clientsName = roomClients.map((c) => {
                 //     return this.clients[c].name;
