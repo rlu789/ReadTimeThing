@@ -28,7 +28,7 @@ export class Message {
             // console.log(req.query.roomId)
             this.Model.find({
                 roomId: req.query.roomId
-            }).sort({ createAt: -1 }).exec((err, messages) => {
+            }).sort({ createAt: 1 }).exec((err, messages) => {
                 if (err) console.log(err);
                 res.status(200).send(messages);
             });

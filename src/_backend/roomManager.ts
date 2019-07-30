@@ -8,7 +8,6 @@ export class RoomManager {
     constructor(public app: express.Application, public io: ioImport.Server, public roomModel: Room, public msgModel: Message) {
 
     }
-    
 
     removeRoom (id: string) {
         this.roomModel.Model.findByIdAndDelete({ _id: id }, (err, res) => {
