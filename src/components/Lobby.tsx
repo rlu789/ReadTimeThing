@@ -10,6 +10,7 @@ import { IRoom, RoomReq } from "../_backend/room";
 import $ = require('jquery');
 import { LobbyCard } from "./LobbyCard";
 import { RouteComponentProps } from "react-router-dom";
+import CircularProgress from '@material-ui/core/CircularProgress';
 import stateManager from "../utils/state";
 
 interface LobbyProps extends RouteComponentProps {
@@ -43,6 +44,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
 
 
         window.socket.on('roomAdded', (lobby: IRoom) => {
+            lobby.guests = 1;
             var roomState = this.state.rooms;
             if (!roomState) roomState = [];
             roomState.unshift(lobby);
@@ -111,7 +113,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-3">
+                    <div className="col-md-6 col-lg-3">
                         <Paper className="lobby">
                             <TextField
                                 margin="dense"
@@ -124,7 +126,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
                             />
                         </Paper>
                     </div>
-                    <div className="col-9">
+                    <div className="col-md-6 col-lg-9">
                         <Paper className="lobby">
                             <Typography variant="h5" component="h2">
                                 Rooms
@@ -135,7 +137,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
                             <LobbyAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbyAdd>
                             {this.state.rooms ? (this.state.rooms.map((r) => {
                                 return <LobbyCard roomModel={r} history={this.props.history}></LobbyCard>
-                            })) : <div>Loading</div>}
+                            })) : <div className="loader"><CircularProgress /></div>}
                         </Paper>
                     </div>
                 </div>

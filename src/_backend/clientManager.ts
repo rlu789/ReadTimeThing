@@ -24,14 +24,19 @@ export class ClientManager {
 
     private updateGuestCount(roomId: string) {
         this.io.in(roomId).clients((error: any, roomClients: []) => {
-            if (error) throw error;
+            if (error) console.log(error);
             if (roomClients.length === 0)
                 this.roomModel.removeRoom(roomId);
             else {
-                var clientsName = roomClients.map((c) => {
-                    return this.clients[c].name;
+                // var clientsName = roomClients.map((c) => {
+                //     return this.clients[c].name;
+                // });
+                var clientObj: {[key: string]: string} = {};
+                roomClients.forEach((c) => {
+                    return clientObj[c] = this.clients[c].name;
                 });
-                this.io.emit(roomId + 'GuestUpdate', { clients: clientsName });
+
+                this.io.emit(roomId + 'GuestUpdate', { clients: clientObj });
             }
         });
     }

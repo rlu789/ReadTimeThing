@@ -13,6 +13,7 @@ import mongoose = require('mongoose');
 import * as path from 'path';
 import { Room } from "./_backend/room";
 import { ClientManager } from "./_backend/clientManager";
+import { Message } from "./_backend/message";
 
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
@@ -20,6 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 var RoomModel = new Room(app, io);
+var MessageModel = new Message(app, io);
 var Clients = new ClientManager(app, io, RoomModel);
 
 io.on('connection', (socket) => {

@@ -1,0 +1,40 @@
+import express = require('express');
+import ioImport = require('socket.io');
+import mongoose = require('mongoose');
+
+export interface IMessage {
+    author: string;
+    message: string;
+    createAt: string;
+    roomId: string;
+}
+
+export class Message {
+    public Model = mongoose.model('Message', new mongoose.Schema({
+        author: String,
+        message: String,
+        roomId: String,
+        createAt: { type: Date, default: Date.now },
+    }));
+
+    constructor(public app: express.Application, public io: ioImport.Server) {
+        app.get("/messages", (req, res) => {
+            this.Model.find({
+                roomId: req.query.roomId
+            }).sort({ createAt: -1 }).exec((err, messages) => {
+                if (err) console.log(err);
+                res.status(200).send(messages);
+            });
+        });
+
+        app.post("/messages", (req, res) => {
+            var msg = new this.Model(req.body);
+            msg.save((err, product) => {
+                if (err)
+                    res.sendStatus(500);
+                res.status(200).send(product);
+                io.emit(req.body.roomId + 'messageAdded', product);
+            });
+        })
+    }
+}

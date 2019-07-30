@@ -60,7 +60,7 @@ export class Room {
 
     removeRoom (id: string) {
         this.Model.findByIdAndDelete({ _id: id }, (err, res) => {
-            if (err) throw err;
+            if (err) console.log(err);
         });
         this.io.emit('roomRemoved', id);
     }

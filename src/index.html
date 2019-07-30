@@ -22,8 +22,14 @@
         header a {
             color: inherit;
         }
+
         header a:hover {
             color: inherit;
+        }
+
+        .loader {
+            margin: 0 auto;
+            display: table;
         }
 
         .lobby {
@@ -36,6 +42,29 @@
             width: 300px;
             display: inline-block;
             margin: 0 15px 5px 0;
+        }
+
+        .chat-panel {
+            width: 100%;
+            padding: 15px 5px;
+            height: 85vh;
+        }
+
+        .chat-panel .chat-list {
+            height: 75%;
+            overflow-y: auto;
+        }
+
+        .chat-panel .chat-form {
+            /* height: 20%; */
+        }
+
+        .chat-author {
+            font-weight: 600;
+        }
+
+        .chat-message {
+            overflow-wrap: break-word;
         }
     </style>
 </head>
