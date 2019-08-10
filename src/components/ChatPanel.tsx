@@ -32,7 +32,7 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
             });
         })
 
-        window.socket.on(this.props.roomId + 'messageAdded', (msg: IMessage) => {
+        window.socket.on('messageAdded', (msg: IMessage) => {
             this.setState(state => {
                 const newMsgs = [...state.messages, msg];
 

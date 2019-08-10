@@ -1,6 +1,7 @@
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
 import { ChatPanel } from "./ChatPanel";
+import { Youtube } from "./Youtube";
 
 interface RoomProps extends RouteComponentProps {
 
@@ -36,14 +37,15 @@ export class Room extends React.Component<RoomProps, RoomState> {
 
     render() {
         return (
-            <div className="container">
+            <div className="container-fluid">
                 <div className="row">
-                    <div className="col-8">
+                    <div className="col-md-6 col-lg-8">
+                        <Youtube></Youtube>
                         <p>hello there: </p>
                         {Object.keys(this.state.clients).map((c) => {
                             return <p>{this.state.clients[c]}</p>
                         })}</div>
-                    <div className="col-4">
+                    <div className="col-md-6 col-lg-4">
                         <ChatPanel roomId={this.state.roomId} clients={this.state.clients}></ChatPanel>
                     </div>
                 </div>

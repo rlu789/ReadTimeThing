@@ -23,6 +23,7 @@ script.onload = complete;
 
 declare global {
     interface Window {
+        onYouTubeIframeAPIReady: (() => void) | undefined;
         socket: SocketIOClient.Socket;
     }
 }

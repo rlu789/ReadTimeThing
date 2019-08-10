@@ -36,6 +36,7 @@ export class ClientManager {
                     return clientObj[c] = this.clients[c].name;
                 });
 
+                // cant do io.in(room) implementation because this info is all being comsumed in the lobby.tsx
                 this.io.emit(roomId + 'GuestUpdate', { clients: clientObj });
             }
         });

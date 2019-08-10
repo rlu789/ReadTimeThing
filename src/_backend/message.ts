@@ -40,7 +40,7 @@ export class Message {
                 if (err)
                     res.sendStatus(500);
                 res.status(200).send(product);
-                io.emit(req.body.roomId + 'messageAdded', product);
+                io.in(req.body.roomId).emit("messageAdded", product)
             });
         })
     }
