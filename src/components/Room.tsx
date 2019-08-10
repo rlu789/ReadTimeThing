@@ -40,7 +40,7 @@ export class Room extends React.Component<RoomProps, RoomState> {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-md-6 col-lg-8">
-                        <Youtube></Youtube>
+                        <Youtube roomId={this.state.roomId}></Youtube>
                         <p>hello there: </p>
                         {Object.keys(this.state.clients).map((c) => {
                             return <p>{this.state.clients[c]}</p>

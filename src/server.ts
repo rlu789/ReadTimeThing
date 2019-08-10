@@ -15,6 +15,7 @@ import { Room } from "./_backend/room";
 import { ClientManager } from "./_backend/clientManager";
 import { Message } from "./_backend/message";
 import { RoomManager } from "./_backend/roomManager";
+import { YoutubeHandler } from "./_backend/youtubeHandler";
 
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
@@ -25,9 +26,11 @@ var RoomModel = new Room(app, io);
 var MessageModel = new Message(app, io);
 var Rooms = new RoomManager(app, io, RoomModel, MessageModel);
 var Clients = new ClientManager(app, io, Rooms);
+var YT = new YoutubeHandler(app, io);
 
 io.on('connection', (socket) => {
   Clients.newClient(socket);
+  YT.registerEvents(socket);
 });
 
 mongoose.connect(secret.privateDbUrl, { useNewUrlParser: true }, (err) => {
