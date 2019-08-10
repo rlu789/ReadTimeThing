@@ -36,7 +36,7 @@ export class Room extends React.Component<RoomProps, RoomState> {
 
     render() {
         return (
-            <div className="container-fluid">
+            <div className="container">
                 <div className="row">
                     <div className="col-8">
                         <p>hello there: </p>

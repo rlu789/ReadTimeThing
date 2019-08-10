@@ -44,7 +44,8 @@ export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
 
     render() {
         return (
-            <Dialog fullWidth={true} maxWidth="md" onExited={() => {this.setState({lobbyName: "", lobbyDesc: ""})}} open={this.props.open} onClose={this.props.handleClose.bind(undefined, this.createReqObject())}>
+            <Dialog fullWidth={true} maxWidth="md" onExited={() => {this.setState({lobbyName: "", lobbyDesc: ""})}} 
+                open={this.props.open} onClose={this.props.handleClose.bind(undefined, undefined)}>
                 <DialogTitle id="form-dialog-title">Add Lobby</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
