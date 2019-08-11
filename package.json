@@ -6,8 +6,9 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "parcel build src/index.html && ts-node-dev --respawn --transpileOnly ./src/server.ts ",
-    "start": "parcel build src/index.html && tsc && node ./dist/server.js",
-    "react": "parcel build src/index.html"
+    "start": "concurrently \"npm run server\" \"npm run react\"",
+    "react": "parcel build src/index.html",
+    "server": "tsc && node ./dist/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,7 @@
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
     "body-parser": "^1.18.3",
+    "concurrently": "^4.1.1",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "http": "0.0.0",
