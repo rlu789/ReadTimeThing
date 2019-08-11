@@ -20,51 +20,91 @@ export interface CueVid {
 }
 
 export class YoutubeHandler {
-    private videos: {[roomId: string]: VideoState} = {};
+    private videos: { [roomId: string]: { state: VideoState, timeout: boolean } } = {};
+
+    private setupVid(roomId: string, vidId: string = '') {
+        this.videos[roomId] = {
+            state: {
+                id: vidId,
+                startDate: null,
+                isPaused: true,
+                timeOffset: 0
+            },
+            timeout: false
+        };
+    }
+
+    private resetVid(roomId: string, vidId: string = '') {
+        this.videos[roomId].state = {
+            id: vidId,
+            startDate: null,
+            isPaused: true,
+            timeOffset: 0
+        };
+    }
+
+    private setRoomTimeout(roomId: string) {
+        // prevent spamming of actions
+        var self = this;
+        self.videos[roomId].timeout = true;
+        setTimeout(function () {
+            console.log('timeout completed');
+            self.videos[roomId].timeout = false;
+        }, 1000);
+    }
 
     constructor(public app: express.Application, public io: ioImport.Server) {
         app.get('/youtube', (req, res) => {
             var roomId = req.query.roomId;
-            var videoState = this.videos[roomId];
-            if (videoState) {
-                res.status(200).send(videoState);
+            var video = this.videos[roomId];
+            if (video) {
+                res.status(200).send(video.state);
             }
             else {
-                this.videos[roomId] = {
-                    id: '',
-                    startDate: null,
-                    isPaused: true,
-                    timeOffset: 0
-                };
+                this.setupVid(roomId);
                 res.send();
             }
         });
     }
 
-    public registerEvents (socket: ioImport.Socket) {
+    public registerEvents(socket: ioImport.Socket) {
+        var self = this;
+        var doActionWithTimeout = function (roomId: string, callback: () => void) {
+            var v = self.videos[roomId];
+            if (v.timeout)
+                socket.emit("videoTimeout");
+            else {
+                self.setRoomTimeout(roomId);
+                callback();
+            }
+        };
+
         socket.on('cueVideo', (cue: CueVid) => {
-            this.videos[cue.roomId] = {
-                id: cue.vidId,
-                startDate: null,
-                isPaused: true,
-                timeOffset: 0
-            };
-            this.io.in(cue.roomId).emit('cueVideo', cue.vidId);
+            this.resetVid(cue.roomId, cue.vidId);
+            doActionWithTimeout(cue.roomId, () => {
+                this.io.in(cue.roomId).emit('cueVideo', cue.vidId);
+            });
         });
 
         socket.on('playVideo', (roomId: string) => {
-            this.videos[roomId].startDate = new Date();
-            this.videos[roomId].isPaused = false;
-            this.io.in(roomId).emit('playVideo');
+            doActionWithTimeout(roomId, () => {
+                var v = this.videos[roomId];
+                v.state.startDate = new Date();
+                v.state.isPaused = false;
+                this.io.in(roomId).emit('playVideo');
+            });
         });
 
         socket.on('pauseVideo', (roomId: string) => {
-            var pauseDate = new Date();
-            if (this.videos[roomId].startDate)
-                this.videos[roomId].timeOffset += (pauseDate.getTime() - (<Date>this.videos[roomId].startDate).getTime()) / 1000;
-            this.videos[roomId].isPaused = true;
-            console.log(this.videos[roomId]);
-            this.io.in(roomId).emit('pauseVideo');
+            doActionWithTimeout(roomId, () => {
+                var v = this.videos[roomId];
+                var pauseDate = new Date();
+                if (v.state.startDate)
+                    v.state.timeOffset += (pauseDate.getTime() - (<Date>v.state.startDate).getTime()) / 1000;
+                v.state.isPaused = true;
+                // console.log(v);
+                this.io.in(roomId).emit('pauseVideo');
+            });
         });
     }
 }

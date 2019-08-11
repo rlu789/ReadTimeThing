@@ -3,6 +3,7 @@ import { TextField, IconButton } from "@material-ui/core";
 import PlayCircleFilled from "@material-ui/icons/PlayCircleFilled";
 import PauseCircleFilled from "@material-ui/icons/PauseCircleFilled";
 import Slider from '@material-ui/lab/Slider';
+import Snackbar from '@material-ui/core/Snackbar';
 import $ = require('jquery');
 import { CueVid, VideoState, VideoStateClient } from "../_backend/youtubeHandler";
 
@@ -11,6 +12,7 @@ interface YoutubeProps {
 }
 interface YoutubeState {
     audioValue: number;
+    snackBarOpen: boolean;
 }
 
 export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
@@ -38,7 +40,8 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         }
 
         this.state = {
-            audioValue: 100
+            audioValue: 100,
+            snackBarOpen: false
         };
     }
 
@@ -90,6 +93,11 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         window.socket.on('pauseVideo', () => {
             self.ytPlayer.pauseVideo();
         });
+        window.socket.on('videoTimeout', () => {
+            this.setState({
+                snackBarOpen: true
+            });
+        });
     }
 
     cueVideo(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -121,6 +129,16 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         window.socket.emit('pauseVideo', this.props.roomId);
     }
 
+    snackBarClose(event: object, reason: string) {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        this.setState({
+            snackBarOpen: false
+        });
+    }
+
     render() {
         return (
             <div className="youtube">
@@ -130,7 +148,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                         margin="normal"
                         fullWidth={true}
                         onKeyDownCapture={(e) => this.cueVideo(e)}
-                        defaultValue="https://www.youtube.com/watch?v=-2-lW9rYmh4"
+                        defaultValue="https://www.youtube.com/watch?v=QzLgBxUC_Yc"
                     />
                     <div className="youtube-controls">
                         <IconButton onClick={this.playVideo.bind(this)}>
@@ -146,6 +164,17 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                     <div id="player" tabIndex={-1}>
                     </div>
                 </div>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={this.state.snackBarOpen}
+                    onClose={this.snackBarClose.bind(this)}
+                    autoHideDuration={1000}
+                    message={<span>Please wait.</span>}
+                />
             </div>
         );
     }
