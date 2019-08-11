@@ -10,15 +10,13 @@ interface YoutubeProps {
     roomId: string
 }
 interface YoutubeState {
+    audioValue: number;
 }
 
 export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
     private ytPlayer: any;
     constructor(props: YoutubeProps) {
         super(props);
-    }
-
-    componentDidMount() {
         var self = this;
 
         var ytState = $.get("/youtube", { roomId: this.props.roomId });
@@ -38,6 +36,15 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         else {
             this.initPlayer(ytState);
         }
+
+        this.state = {
+            audioValue: 100
+        };
+    }
+
+    changeAudio(event: React.ChangeEvent<{}>, audioValue: number) {
+        this.setState({ audioValue: audioValue });
+        this.ytPlayer.setVolume(audioValue);
     }
 
     initPlayer(ytState: JQuery.jqXHR<any>) {
@@ -54,8 +61,6 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                 }
             };
             if (res) {
-                // console.log(res);
-                // console.log(settings);
                 settings.videoId = res.id;
                 settings.events.onReady = function () {
                     if (res.isPaused) {
@@ -134,7 +139,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                         <IconButton onClick={this.pauseVideo.bind(this)}>
                             <PauseCircleFilled />
                         </IconButton>
-                        {/* <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} /> */}
+                        <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} />
                     </div>
                 </div>
                 <div className="row no-gutters">

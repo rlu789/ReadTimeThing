@@ -8,6 +8,7 @@ import { MessageReq, IMessage } from "../_backend/message";
 interface ChatPanelProps {
     roomId: string;
     clients: { [key: string]: string };
+    hidden: boolean;
 }
 interface ChatPanelState {
     message: string;
@@ -84,7 +85,7 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
             });
 
             return (
-                <div className="chat-panel">
+                <div hidden={this.props.hidden} className="chat-panel fade-in">
                     <div className="chat-list">
                         {/* <Button disabled={this.state.btnLoading} variant="contained" color="primary" fullWidth={true} onClick={() => {
                         this.props.loadMoreMsgs().then(() => this.setState({ btnLoading: false }));

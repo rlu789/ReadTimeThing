@@ -111,7 +111,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     render() {
         return (
-            <div className="container">
+            <div className="container fade-in">
                 <div className="row">
                     <div className="col-md-6 col-lg-3">
                         <Paper className="lobby">
