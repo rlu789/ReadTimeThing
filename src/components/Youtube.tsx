@@ -63,7 +63,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                     'onStateChange': () => { }
                 }
             };
-            if (res) {
+            if (res && res.id) {
                 settings.videoId = res.id;
                 settings.events.onReady = function () {
                     if (res.isPaused) {

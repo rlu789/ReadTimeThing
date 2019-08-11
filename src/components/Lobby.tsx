@@ -111,7 +111,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
 
     render() {
         return (
-            <div className="container fade-in">
+            <div className="container">
                 <div className="row">
                     <div className="col-md-6 col-lg-3">
                         <Paper className="lobby">
@@ -127,12 +127,12 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
                         </Paper>
                     </div>
                     <div className="col-md-6 col-lg-9">
-                        <Paper className="lobby">
+                        <Paper className="lobby fade-in">
                             <Typography variant="h5" component="h2">
                                 Rooms
-                            <IconButton color="primary" onClick={this.addLobby.bind(this)}>
-                                    <AddIcon />
-                                </IconButton >
+                            {this.state.rooms ? <IconButton className="fade-in" color="primary" onClick={this.addLobby.bind(this)}>
+                                <AddIcon />
+                            </IconButton > : undefined}
                             </Typography>
                             <LobbyAdd open={this.state.modalOpen} handleClose={this.handleClose.bind(this)}></LobbyAdd>
                             {this.state.rooms ? (this.state.rooms.map((r) => {

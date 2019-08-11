@@ -4,6 +4,7 @@ import Tab from '@material-ui/core/Tab';
 import { RouteComponentProps } from "react-router";
 import { ChatPanel } from "./ChatPanel";
 import { Youtube } from "./Youtube";
+import $ = require('jquery');
 
 interface RoomProps extends RouteComponentProps {
 
@@ -28,8 +29,21 @@ export class Room extends React.Component<RoomProps, RoomState> {
         };
 
         window.socket.on(routeParams.id + 'GuestUpdate', (update: { clients: { [key: string]: string } }) => {
+            var oldClients = this.state.clients;
+            var newClients = update.clients;
+            Object.keys(oldClients).forEach(old => {
+                if (!newClients[old]) { // if client has left room
+                    if (!oldClients[old].endsWith("\t[gone]"))
+                        oldClients[old] += "\t[gone]";
+                }
+                else {  // if client is still in room or has reconnected
+                    oldClients[old].replace("\t[gone]", "");
+                }
+            });
+            $.extend( oldClients, newClients ); // merge newClients obj into oldClients obj
+            
             this.setState({
-                clients: update.clients
+                clients: oldClients
             });
         });
     }

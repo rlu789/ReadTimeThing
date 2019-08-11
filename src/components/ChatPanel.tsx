@@ -77,9 +77,9 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
             var msgs = this.state.messages.map((msg, index) => {
                 var alias = this.props.clients[msg.author];
                 return (
-                    <div className="chat-messages">
-                        <span className="chat-author">{alias ? alias : msg.author}</span>
-                        <p className="chat-message">{msg.message}</p>
+                    <div className="row no-gutters chat-messages">
+                        <span className="col chat-author">{alias ? alias : msg.author}: </span>
+                        <span className="col-9 chat-message">{msg.message}</span>
                     </div>
                 );
             });
