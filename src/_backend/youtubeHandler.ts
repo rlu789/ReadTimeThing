@@ -48,10 +48,19 @@ export class YoutubeHandler {
         var self = this;
         self.videos[roomId].timeout = true;
         setTimeout(function () {
-            console.log('timeout completed');
             self.videos[roomId].timeout = false;
         }, 1000);
     }
+
+    private doActionWithTimeout(socket: ioImport.Socket, roomId: string, callback: () => void) {
+        var v = this.videos[roomId];
+        if (v.timeout)
+            socket.emit("videoTimeout"); // reply to sender that they have to wait
+        else {
+            this.setRoomTimeout(roomId);
+            callback();
+        }
+    };
 
     constructor(public app: express.Application, public io: ioImport.Server) {
         app.get('/youtube', (req, res) => {
@@ -68,26 +77,15 @@ export class YoutubeHandler {
     }
 
     public registerEvents(socket: ioImport.Socket) {
-        var self = this;
-        var doActionWithTimeout = function (roomId: string, callback: () => void) {
-            var v = self.videos[roomId];
-            if (v.timeout)
-                socket.emit("videoTimeout");
-            else {
-                self.setRoomTimeout(roomId);
-                callback();
-            }
-        };
-
         socket.on('cueVideo', (cue: CueVid) => {
             this.resetVid(cue.roomId, cue.vidId);
-            doActionWithTimeout(cue.roomId, () => {
+            this.doActionWithTimeout(socket, cue.roomId, () => {
                 this.io.in(cue.roomId).emit('cueVideo', cue.vidId);
             });
         });
 
         socket.on('playVideo', (roomId: string) => {
-            doActionWithTimeout(roomId, () => {
+            this.doActionWithTimeout(socket, roomId, () => {
                 var v = this.videos[roomId];
                 v.state.startDate = new Date();
                 v.state.isPaused = false;
@@ -96,7 +94,7 @@ export class YoutubeHandler {
         });
 
         socket.on('pauseVideo', (roomId: string) => {
-            doActionWithTimeout(roomId, () => {
+            this.doActionWithTimeout(socket, roomId, () => {
                 var v = this.videos[roomId];
                 var pauseDate = new Date();
                 if (v.state.startDate)
@@ -105,6 +103,17 @@ export class YoutubeHandler {
                 // console.log(v);
                 this.io.in(roomId).emit('pauseVideo');
             });
+        });
+
+        socket.on('seekVideo', (req: {by: number, roomId: string}) => {
+            var v = this.videos[req.roomId];
+            if (v.state.id) {
+                this.doActionWithTimeout(socket, req.roomId, () => {
+                    v.state.timeOffset += req.by;
+                    if (v.state.timeOffset < 0) v.state.timeOffset = 0; // video cant be in negative seconds
+                    this.io.in(req.roomId).emit('seekVideo', v.state);
+                });
+            }
         });
     }
 }

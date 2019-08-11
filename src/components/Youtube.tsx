@@ -2,6 +2,8 @@ import * as React from "react";
 import { TextField, IconButton } from "@material-ui/core";
 import PlayCircleFilled from "@material-ui/icons/PlayCircleFilled";
 import PauseCircleFilled from "@material-ui/icons/PauseCircleFilled";
+import FastForward from "@material-ui/icons/FastForward";
+import FastRewind from "@material-ui/icons/FastRewind";
 import Slider from '@material-ui/lab/Slider';
 import Snackbar from '@material-ui/core/Snackbar';
 import $ = require('jquery');
@@ -50,6 +52,18 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         this.ytPlayer.setVolume(audioValue);
     }
 
+    seekBasedOnState(state: VideoStateClient) {
+        if (state.isPaused) {
+            this.ytPlayer.seekTo(state.timeOffset);
+            this.ytPlayer.playVideo();
+            this.ytPlayer.pauseVideo();
+        }
+        if (!state.isPaused) {
+            this.ytPlayer.seekTo(state.timeOffset + ((new Date().getTime() - new Date(state.startDate).getTime()) / 1000));
+            this.ytPlayer.playVideo();
+        }
+    }
+
     initPlayer(ytState: JQuery.jqXHR<any>) {
         var self = this;
         ytState.then((res: VideoStateClient | null) => {
@@ -66,15 +80,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             if (res && res.id) {
                 settings.videoId = res.id;
                 settings.events.onReady = function () {
-                    if (res.isPaused) {
-                        self.ytPlayer.seekTo(res.timeOffset);
-                        self.ytPlayer.playVideo();
-                        self.ytPlayer.pauseVideo();
-                    }
-                    if (!res.isPaused) {
-                        self.ytPlayer.seekTo(res.timeOffset + ((new Date().getTime() - new Date(res.startDate).getTime()) / 1000));
-                        self.ytPlayer.playVideo();
-                    }
+                    self.seekBasedOnState(res);
                 }
             }
             // @ts-ignore
@@ -92,6 +98,9 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         });
         window.socket.on('pauseVideo', () => {
             self.ytPlayer.pauseVideo();
+        });
+        window.socket.on('seekVideo', (res: VideoStateClient) => {
+            self.seekBasedOnState(res);
         });
         window.socket.on('videoTimeout', () => {
             this.setState({
@@ -129,6 +138,10 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         window.socket.emit('pauseVideo', this.props.roomId);
     }
 
+    seekVideo(by: number) {
+        window.socket.emit('seekVideo', {by: by, roomId: this.props.roomId});
+    }
+
     snackBarClose(event: object, reason: string) {
         if (reason === 'clickaway') {
             return;
@@ -156,6 +169,12 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                         </IconButton>
                         <IconButton onClick={this.pauseVideo.bind(this)}>
                             <PauseCircleFilled />
+                        </IconButton>
+                        <IconButton onClick={this.seekVideo.bind(this, -10)}>
+                            <FastRewind />
+                        </IconButton>
+                        <IconButton onClick={this.seekVideo.bind(this, 10)}>
+                            <FastForward />
                         </IconButton>
                         <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} />
                     </div>
