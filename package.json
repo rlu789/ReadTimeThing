@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "dev": "parcel build src/index.html && ts-node-dev --respawn --transpileOnly ./src/server.ts ",
+    "dev": "concurrently \"parcel build src/index.html\" \"ts-node-dev --respawn --transpileOnly ./src/server.ts\"",
     "start": "concurrently \"npm run server\" \"npm run react\"",
     "react": "parcel build src/index.html",
     "server": "tsc && node ./dist/server.js"
