@@ -15,6 +15,7 @@ import { YoutubeHandler } from "./_backend/youtubeHandler";
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
 app.use("/assets", express.static("assets"));
+app.use("/img", express.static("assets/chessboardjs/img"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 

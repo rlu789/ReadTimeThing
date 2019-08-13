@@ -8,7 +8,7 @@ import $ = require('jquery');
 import { IRoom } from "../_backend/room";
 import { CircularProgress } from "@material-ui/core";
 import { RoomTypes } from "../_backend/constants";
-import { Chess } from "./Chess";
+import { ChessView } from "./ChessView";
 
 interface RoomProps extends RouteComponentProps {
 
@@ -75,7 +75,7 @@ export class Room extends React.Component<RoomProps, RoomState> {
             if (roomInfo === "" || (typeof roomInfo === "object" && roomInfo.roomType === RoomTypes.Youtube))
                 roomContent = <Youtube roomId={this.state.roomId}></Youtube>;
             else if (typeof roomInfo === "object" && roomInfo.roomType === RoomTypes.Chess) {
-                roomContent = <Chess></Chess>;
+                roomContent = <ChessView></ChessView>;
             }
         }
 

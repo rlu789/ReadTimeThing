@@ -51,7 +51,6 @@ export class Room {
         });
 
         app.get('/room', (req, res) => {
-            console.log(req.query.roomId)
             this.Model.findById(req.query.roomId, (err, product) => {
                 if (err) {
                     res.sendStatus(500);

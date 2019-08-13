@@ -16,20 +16,12 @@ export function createScript(src: string, onLoad?: () => any, onErr?: () => any,
     }
 }
 
-export function createStyle(href: string, onLoad?: () => any, onErr?: () => any, onExists?: () => any) {
+export function createStyle(href: string) {
     if (!document.querySelector("link[href='" + href + "']")) {
         var head = document.getElementsByTagName('head')[0];
         var linkEl = document.createElement('link');
         linkEl.href = href;
+        linkEl.rel = "stylesheet";
         head.appendChild(linkEl);
-
-        linkEl.onload = function () { // with not work on IE <9
-            if (onLoad)
-                onLoad();
-        };
-    }
-    else {
-        if (onExists)
-            onExists();
     }
 }
