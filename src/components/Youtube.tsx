@@ -8,6 +8,7 @@ import Slider from '@material-ui/lab/Slider';
 import Snackbar from '@material-ui/core/Snackbar';
 import $ = require('jquery');
 import { CueVid, VideoState, VideoStateClient } from "../_backend/youtubeHandler";
+import { createScript } from "../utils/common";
 
 interface YoutubeProps {
     roomId: string
@@ -32,21 +33,15 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
 
         var ytState = $.get("/youtube", { roomId: this.props.roomId });
 
-        if (!document.querySelector("script[src='https://www.youtube.com/iframe_api']")) { // youtube script hasnt been added
-            var tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            if (firstScriptTag.parentNode)
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            else throw Error("Unable to add https://www.youtube.com/iframe_api script tag");
-
+        createScript("https://www.youtube.com/iframe_api", () => {
             window.onYouTubeIframeAPIReady = function () {
                 self.initPlayer(ytState);
             };
-        }
-        else {
-            this.initPlayer(ytState);
-        }
+        }, () => {
+            throw Error("Unable to add https://www.youtube.com/iframe_api script tag");
+        }, () => {
+            self.initPlayer(ytState);
+        });
     }
 
     changeAudio(event: React.ChangeEvent<{}>, audioValue: number) {
@@ -83,7 +78,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                 settings.videoId = res.id;
                 settings.events.onReady = function () {
                     self.seekBasedOnState(res);
-                    self.setState({videoCued: true});
+                    self.setState({ videoCued: true });
                 }
             }
             // @ts-ignore
@@ -94,7 +89,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                 self.ytPlayer.seekTo(0);
                 self.ytPlayer.playVideo();
                 self.ytPlayer.pauseVideo();
-                self.setState({videoCued: true});
+                self.setState({ videoCued: true });
             });
             window.socket.on('playVideo', () => {
                 self.ytPlayer.playVideo();
@@ -143,7 +138,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
     }
 
     seekVideo(by: number) {
-        window.socket.emit('seekVideo', {by: by, roomId: this.props.roomId});
+        window.socket.emit('seekVideo', { by: by, roomId: this.props.roomId });
     }
 
     snackBarClose(event: object, reason: string) {
