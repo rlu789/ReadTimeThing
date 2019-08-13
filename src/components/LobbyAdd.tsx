@@ -6,15 +6,21 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
 import { RoomReq } from '../_backend/room';
+import { RoomTypes } from '../_backend/constants';
 
 interface LobbyAddProps {
     open: boolean;
     handleClose: (lReq?: RoomReq) => void;
 }
 interface LobbyAddState {
-    lobbyName: string
-    lobbyDesc: string
+    lobbyName: string;
+    lobbyDesc: string;
+    lobbyType: number;
 }
 
 export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
@@ -23,34 +29,36 @@ export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
 
         this.state = {
             lobbyName: "",
-            lobbyDesc: ""
+            lobbyDesc: "",
+            lobbyType: 0
         }
     }
 
-    handleChange(key: string, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-        var v = event.currentTarget.value;
+    handleChange(key: string, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>, isSelect = false) {
+        var v = isSelect ? event.target.value : event.currentTarget.value;
         this.setState(prevState => ({
             ...prevState,
             [key]: v
         }));
     }
-    
+
     createReqObject(): RoomReq {
         return {
             name: this.state.lobbyName,
-            description: this.state.lobbyDesc
+            description: this.state.lobbyDesc,
+            roomType: this.state.lobbyType
         }
     }
 
     render() {
         return (
-            <Dialog fullWidth={true} maxWidth="md" onExited={() => {this.setState({lobbyName: "", lobbyDesc: ""})}} 
+            <Dialog fullWidth={true} maxWidth="md" onExited={() => { this.setState({ lobbyName: "", lobbyDesc: "" }) }}
                 open={this.props.open} onClose={this.props.handleClose.bind(undefined, undefined)}>
                 <DialogTitle id="form-dialog-title">Add Lobby</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Add a lobby haha
-          </DialogContentText>
+                        <span>Add a lobby haha</span>
+                    </DialogContentText>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -68,14 +76,24 @@ export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
                         type="text"
                         fullWidth
                     />
+                    <FormControl fullWidth>
+                        <InputLabel htmlFor="lobby-type">Lobby Type</InputLabel>
+                        <Select value={this.state.lobbyType} onChange={(e) => this.handleChange("lobbyType", e, true)} inputProps={{
+                            id: 'lobby-type',
+                        }}>
+                            {Object.keys(RoomTypes).map((key: string) => {
+                                return <MenuItem value={RoomTypes[key]}>{key}</MenuItem>
+                            })}
+                        </Select>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.props.handleClose.bind(undefined, undefined)} color="primary">
-                        Cancel
-          </Button>
+                        <span>Cancel</span>
+                    </Button>
                     <Button onClick={this.props.handleClose.bind(undefined, this.createReqObject())} color="primary">
-                        Add
-          </Button>
+                        <span>Add</span>
+                    </Button>
                 </DialogActions>
             </Dialog>
         );

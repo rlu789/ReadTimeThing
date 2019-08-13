@@ -31,7 +31,7 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
                 loading: false,
                 messages: res
             });
-        })
+        });
 
         window.socket.on('messageAdded', (msg: IMessage) => {
             this.setState(state => {

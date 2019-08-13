@@ -5,6 +5,10 @@ import { RouteComponentProps } from "react-router";
 import { ChatPanel } from "./ChatPanel";
 import { Youtube } from "./Youtube";
 import $ = require('jquery');
+import { IRoom } from "../_backend/room";
+import { CircularProgress } from "@material-ui/core";
+import { RoomTypes } from "../_backend/constants";
+import { Chess } from "./Chess";
 
 interface RoomProps extends RouteComponentProps {
 
@@ -13,6 +17,7 @@ interface RoomState {
     clients: { [key: string]: string };
     roomId: string;
     tabValue: number;
+    roomInfo: IRoom | "" | null;
 }
 
 export class Room extends React.Component<RoomProps, RoomState> {
@@ -25,8 +30,13 @@ export class Room extends React.Component<RoomProps, RoomState> {
         this.state = {
             clients: {},
             roomId: routeParams.id,
-            tabValue: 0
+            tabValue: 0,
+            roomInfo: null
         };
+
+        $.get("/room", { roomId: routeParams.id }).then((res: IRoom | "") => {
+            this.setState({ roomInfo: res });
+        });
 
         window.socket.on(routeParams.id + 'GuestUpdate', (update: { clients: { [key: string]: string } }) => {
             var oldClients = this.state.clients;
@@ -58,11 +68,22 @@ export class Room extends React.Component<RoomProps, RoomState> {
     }
 
     render() {
+        var roomInfo = this.state.roomInfo;
+        var roomContent: JSX.Element = <div className="loader"><CircularProgress /></div>;
+        
+        if (roomInfo !== null) {
+            if (roomInfo === "" || (typeof roomInfo === "object" && roomInfo.roomType === RoomTypes.Youtube))
+                roomContent = <Youtube roomId={this.state.roomId}></Youtube>;
+            else if (typeof roomInfo === "object" && roomInfo.roomType === RoomTypes.Chess) {
+                roomContent = <Chess></Chess>;
+            }
+        }
+
         return (
             <div className="container-fluid fade-in">
                 <div className="row">
                     <div className="col-md-6 col-lg-8">
-                        <Youtube roomId={this.state.roomId}></Youtube>
+                        {roomContent}
                     </div>
                     <div className="col-md-6 col-lg-4">
                         <Tabs value={this.state.tabValue} onChange={this.handleTabChange.bind(this)}>

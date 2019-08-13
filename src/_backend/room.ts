@@ -1,13 +1,16 @@
 import mongoose = require('mongoose');
 import { app, io } from './global';
+import { RoomTypes } from './constants';
 
 export interface RoomReq {
     name: string;
+    roomType: number;
     description?: string;
 }
 export interface IRoom {
     name: string;
     description: string;
+    roomType: number;
     guests: number;
     createAt: string;
     _id: string;
@@ -17,6 +20,7 @@ export class Room {
     public Model = mongoose.model('Room', new mongoose.Schema({
         name: String,
         description: String,
+        roomType: { type: Number, default: RoomTypes.Youtube },
         guests: { type: Number, default: 0 },
         createAt: { type: Date, default: Date.now },
     }));
@@ -46,11 +50,24 @@ export class Room {
             });
         });
 
+        app.get('/room', (req, res) => {
+            console.log(req.query.roomId)
+            this.Model.findById(req.query.roomId, (err, product) => {
+                if (err) {
+                    res.sendStatus(500);
+                    console.log(err);
+                }
+                res.send(product);
+            });
+        });
+
         app.post('/addRoom', (req, res) => {
             var room = new this.Model(req.body);
             room.save((err, product) => {
-                if (err)
+                if (err) {
                     res.sendStatus(500);
+                    console.log(err);
+                }
                 res.status(200).send(product);
                 io.emit('roomAdded', product);
             });
