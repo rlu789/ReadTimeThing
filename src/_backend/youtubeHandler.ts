@@ -1,5 +1,5 @@
-import express = require('express');
 import ioImport = require('socket.io');
+import { app, io } from './global';
 
 export interface VideoState {
     id: string;
@@ -62,7 +62,7 @@ export class YoutubeHandler {
         }
     };
 
-    constructor(public app: express.Application, public io: ioImport.Server) {
+    constructor() {
         app.get('/youtube', (req, res) => {
             var roomId = req.query.roomId;
             var video = this.videos[roomId];
@@ -80,7 +80,7 @@ export class YoutubeHandler {
         socket.on('cueVideo', (cue: CueVid) => {
             this.resetVid(cue.roomId, cue.vidId);
             this.doActionWithTimeout(socket, cue.roomId, () => {
-                this.io.in(cue.roomId).emit('cueVideo', cue.vidId);
+                io.in(cue.roomId).emit('cueVideo', cue.vidId);
             });
         });
 
@@ -89,7 +89,7 @@ export class YoutubeHandler {
                 var v = this.videos[roomId];
                 v.state.startDate = new Date();
                 v.state.isPaused = false;
-                this.io.in(roomId).emit('playVideo');
+                io.in(roomId).emit('playVideo');
             });
         });
 
@@ -101,7 +101,7 @@ export class YoutubeHandler {
                     v.state.timeOffset += (pauseDate.getTime() - (<Date>v.state.startDate).getTime()) / 1000;
                 v.state.isPaused = true;
                 // console.log(v);
-                this.io.in(roomId).emit('pauseVideo');
+                io.in(roomId).emit('pauseVideo');
             });
         });
 
@@ -111,7 +111,7 @@ export class YoutubeHandler {
                 this.doActionWithTimeout(socket, req.roomId, () => {
                     v.state.timeOffset += req.by;
                     if (v.state.timeOffset < 0) v.state.timeOffset = 0; // video cant be in negative seconds
-                    this.io.in(req.roomId).emit('seekVideo', v.state);
+                    io.in(req.roomId).emit('seekVideo', v.state);
                 });
             }
         });

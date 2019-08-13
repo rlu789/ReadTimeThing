@@ -1,6 +1,5 @@
-import express = require('express');
-import ioImport = require('socket.io');
 import mongoose = require('mongoose');
+import { app, io } from './global';
 
 export interface RoomReq {
     name: string;
@@ -22,7 +21,7 @@ export class Room {
         createAt: { type: Date, default: Date.now },
     }));
 
-    constructor(public app: express.Application, public io: ioImport.Server) {
+    constructor() {
         app.get('/allRooms', (req, res) => {
             this.Model.find().sort({ createAt: -1 }).exec((err, rooms) => {
                 if (!err) {

@@ -1,7 +1,7 @@
-import express = require('express');
 import ioImport = require('socket.io');
-import mongoose = require('mongoose');
+import { app, io } from './global';
 import { RoomManager } from './roomManager';
+import { YoutubeHandler } from './youtubeHandler';
 
 export interface ClientData {
     rooms: { [key: string]: string };
@@ -12,18 +12,18 @@ export class ClientManager {
     public clients: { [key: string]: ClientData } = {};
     public count = 0;
 
-    constructor(public app: express.Application, public io: ioImport.Server, public roomManager: RoomManager) {
-        this.app.get("/user", (req, res) => {
+    constructor(public roomManager: RoomManager) {
+        app.get("/user", (req, res) => {
             res.status(200).send(this.clients[req.query.id]);
         });
-        this.app.post("/user", (req, res) => {
+        app.post("/user", (req, res) => {
             this.clients[req.body.id].name = req.body.name;
             res.sendStatus(200);
         });
     }
 
     private updateGuestCount(roomId: string) {
-        this.io.in(roomId).clients((error: any, roomClients: []) => {
+        io.in(roomId).clients((error: any, roomClients: []) => {
             if (error) console.log(error);
             if (roomClients.length === 0)
                 this.roomManager.removeRoom(roomId);
@@ -37,12 +37,12 @@ export class ClientManager {
                 });
 
                 // cant do io.in(room) implementation because this info is all being comsumed in the lobby.tsx
-                this.io.emit(roomId + 'GuestUpdate', { clients: clientObj });
+                io.emit(roomId + 'GuestUpdate', { clients: clientObj });
             }
         });
     }
 
-    public newClient(socket: ioImport.Socket) {
+    public newClient(socket: ioImport.Socket, yt: YoutubeHandler) {
         var self = this;
         this.clients[socket.id] = {
             rooms: {},
@@ -55,6 +55,7 @@ export class ClientManager {
             self.clients[socket.id].rooms[roomId] = roomId;
 
             self.updateGuestCount(roomId);
+            yt.registerEvents(socket);
         });
 
         socket.on('unsubscribe', function (roomId: string) {

@@ -13,6 +13,7 @@ interface YoutubeProps {
     roomId: string
 }
 interface YoutubeState {
+    videoCued: boolean;
     audioValue: number;
     snackBarOpen: boolean;
 }
@@ -22,6 +23,12 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
     constructor(props: YoutubeProps) {
         super(props);
         var self = this;
+
+        this.state = {
+            audioValue: 100,
+            snackBarOpen: false,
+            videoCued: false
+        };
 
         var ytState = $.get("/youtube", { roomId: this.props.roomId });
 
@@ -40,11 +47,6 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         else {
             this.initPlayer(ytState);
         }
-
-        this.state = {
-            audioValue: 100,
-            snackBarOpen: false
-        };
     }
 
     changeAudio(event: React.ChangeEvent<{}>, audioValue: number) {
@@ -81,32 +83,34 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                 settings.videoId = res.id;
                 settings.events.onReady = function () {
                     self.seekBasedOnState(res);
+                    self.setState({videoCued: true});
                 }
             }
             // @ts-ignore
             self.ytPlayer = new YT.Player('player', settings);
-        })
 
-        window.socket.on('cueVideo', (res: string) => {
-            self.ytPlayer.cueVideoById(res);
-            self.ytPlayer.seekTo(0);
-            self.ytPlayer.playVideo();
-            self.ytPlayer.pauseVideo();
-        });
-        window.socket.on('playVideo', () => {
-            self.ytPlayer.playVideo();
-        });
-        window.socket.on('pauseVideo', () => {
-            self.ytPlayer.pauseVideo();
-        });
-        window.socket.on('seekVideo', (res: VideoStateClient) => {
-            self.seekBasedOnState(res);
-        });
-        window.socket.on('videoTimeout', () => {
-            this.setState({
-                snackBarOpen: true
+            window.socket.on('cueVideo', (res: string) => {
+                self.ytPlayer.cueVideoById(res);
+                self.ytPlayer.seekTo(0);
+                self.ytPlayer.playVideo();
+                self.ytPlayer.pauseVideo();
+                self.setState({videoCued: true});
             });
-        });
+            window.socket.on('playVideo', () => {
+                self.ytPlayer.playVideo();
+            });
+            window.socket.on('pauseVideo', () => {
+                self.ytPlayer.pauseVideo();
+            });
+            window.socket.on('seekVideo', (res: VideoStateClient) => {
+                self.seekBasedOnState(res);
+            });
+            window.socket.on('videoTimeout', () => {
+                this.setState({
+                    snackBarOpen: true
+                });
+            });
+        })
     }
 
     cueVideo(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -163,7 +167,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                         onKeyDownCapture={(e) => this.cueVideo(e)}
                         defaultValue="https://www.youtube.com/watch?v=QzLgBxUC_Yc"
                     />
-                    <div className="youtube-controls">
+                    <div hidden={!this.state.videoCued} className="fade-in youtube-controls">
                         <IconButton onClick={this.playVideo.bind(this)}>
                             <PlayCircleFilled />
                         </IconButton>
@@ -179,7 +183,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                         <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} />
                     </div>
                 </div>
-                <div className="row no-gutters">
+                <div hidden={!this.state.videoCued} className="fade-in row no-gutters">
                     <div id="player" tabIndex={-1}>
                     </div>
                 </div>

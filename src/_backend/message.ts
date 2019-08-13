@@ -1,5 +1,4 @@
-import express = require('express');
-import ioImport = require('socket.io');
+import { app, io } from './global';
 import mongoose = require('mongoose');
 
 export interface MessageReq {
@@ -23,7 +22,7 @@ export class Message {
         createAt: { type: Date, default: Date.now },
     }));
 
-    constructor(public app: express.Application, public io: ioImport.Server) {
+    constructor() {
         app.get("/messages", (req, res) => {
             // console.log(req.query.roomId)
             this.Model.find({

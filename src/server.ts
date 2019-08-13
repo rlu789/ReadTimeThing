@@ -2,12 +2,7 @@ import secret from "./secret";
 import express = require('express');
 import bodyParser = require('body-parser');
 import cors = require('cors');
-
-const app: express.Application = express();
-import httpImport = require('http');
-var http = new httpImport.Server(app);
-import ioImport = require('socket.io');
-var io = ioImport(http);
+import { app, http, io } from './_backend/global';
 
 import mongoose = require('mongoose');
 import * as path from 'path';
@@ -22,15 +17,14 @@ app.use("/room/*", express.static("dist"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-var RoomModel = new Room(app, io);
-var MessageModel = new Message(app, io);
-var Rooms = new RoomManager(app, io, RoomModel, MessageModel);
-var Clients = new ClientManager(app, io, Rooms);
-var YT = new YoutubeHandler(app, io);
+var RoomModel = new Room();
+var MessageModel = new Message();
+var Rooms = new RoomManager(RoomModel, MessageModel);
+var YT = new YoutubeHandler();
+var Clients = new ClientManager(Rooms);
 
 io.on('connection', (socket) => {
-  Clients.newClient(socket);
-  YT.registerEvents(socket);
+  Clients.newClient(socket, YT);
 });
 
 mongoose.connect(secret.privateDbUrl, { useNewUrlParser: true }, (err) => {
