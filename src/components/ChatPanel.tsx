@@ -27,7 +27,7 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
         };
 
         $.get("/messages", { roomId: this.props.roomId }).then((res: IMessage[]) => {
-            this.setState({ 
+            this.setState({
                 loading: false,
                 messages: res
             });
@@ -95,23 +95,23 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
                     </Button> */}
                         {msgs}
                     </div>
-                    <div className="chat-form">
-                        <TextField
-                            label="Message"
-                            multiline
-                            rows="2"
-                            margin="normal"
-                            fullWidth={true}
-                            onChange={(e) => this.handleChange("message", e)}
-                            onKeyDownCapture={(e) => this.sendMessage(e)}
-                            value={this.state.message}
-                        />
+                    <div className="row chat-form">
+                        <div className="col-10">
+                            <TextField
+                                label="Message"
+                                fullWidth={true}
+                                onChange={(e) => this.handleChange("message", e)}
+                                onKeyDownCapture={(e) => this.sendMessage(e)}
+                                value={this.state.message}
+                            />
+                        </div>
+                        <div className="col-2 send-btn">
+                            <Button variant="contained" color="primary"
+                                onClick={() => this.sendMessage(undefined, true)}>
+                                Send
+                            </Button>
+                        </div>
                     </div>
-                    <Button variant="contained" color="primary"
-                        onClick={() => this.sendMessage(undefined, true)}
-                        style={{ float: 'right' }}>
-                        Send
-                </Button>
                 </div>
             )
         };

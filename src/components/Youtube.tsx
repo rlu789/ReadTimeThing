@@ -162,7 +162,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                         onKeyDownCapture={(e) => this.cueVideo(e)}
                         defaultValue="https://www.youtube.com/watch?v=QzLgBxUC_Yc"
                     />
-                    <div hidden={!this.state.videoCued} className="fade-in youtube-controls">
+                    {this.state.videoCued ? <div className="fade-in youtube-controls">
                         <IconButton onClick={this.playVideo.bind(this)}>
                             <PlayCircleFilled />
                         </IconButton>
@@ -176,7 +176,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                             <FastForward />
                         </IconButton>
                         <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} />
-                    </div>
+                    </div> : <p className="mx-auto">Please load a video</p>}
                 </div>
                 <div hidden={!this.state.videoCued} className="fade-in row no-gutters">
                     <div id="player" tabIndex={-1}>
@@ -185,8 +185,8 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
 
                 <Snackbar
                     anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
+                        vertical: 'top',
+                        horizontal: 'right',
                     }}
                     open={this.state.snackBarOpen}
                     onClose={this.snackBarClose.bind(this)}

@@ -10,16 +10,9 @@ import { Room } from "./components/Room";
 import stateManager from "./utils/state";
 import $ = require('jquery');
 import { ClientData } from "./_backend/clientManager";
+import { createScript } from "./utils/common";
 
-var head = document.getElementsByTagName('head')[0];
-var script: any = document.createElement('script');
-script.type = 'text/javascript';
-script.src = '/socket.io/socket.io.js'; // load this script dynamically so that compiler doesn't die when compiling react
-head.appendChild(script);
-script.onreadystatechange = function () {
-    if (this.readyState == 'complete') complete();
-}
-script.onload = complete;
+createScript('/socket.io/socket.io.js', complete);
 
 declare global {
     interface Window {
@@ -31,7 +24,19 @@ declare global {
 class App extends React.Component<{}, {}> {
     constructor(props: {}) {
         super(props);
-        this.state = {};
+
+        window.socket.on('disconnect', (reason: string) => {
+            console.log('disconnected');
+            if (reason === 'io server disconnect') {
+                // the disconnection was initiated by the server, you need to reconnect manually
+                window.socket.connect();
+            }
+            // else the socket will automatically try to reconnect
+        });
+
+        window.socket.on('reconnect', (attemptNumber: number) => {
+            console.log('reconnect' + attemptNumber);
+        });
     }
 
     render() {
