@@ -12,7 +12,6 @@ import $ = require('jquery');
 import { ClientData } from "./_backend/clientManager";
 import { createScript } from "./utils/common";
 import { ChessBoardFactory } from "chessboardjs";
-import { Chess } from "chess.js";
 
 createScript('/socket.io/socket.io.js', complete);
 window.$ = window.jQuery = $; // for chessboardjs
@@ -21,8 +20,8 @@ declare global {
     interface Window {
         onYouTubeIframeAPIReady: (() => void) | undefined;
         socket: SocketIOClient.Socket;
-        $: any;
-        jQuery: any;
+        $: JQueryStatic;
+        jQuery: JQueryStatic;
         Chessboard: ChessBoardFactory;
     }
 }

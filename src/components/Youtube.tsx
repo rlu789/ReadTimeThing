@@ -7,7 +7,7 @@ import FastRewind from "@material-ui/icons/FastRewind";
 import Slider from '@material-ui/lab/Slider';
 import Snackbar from '@material-ui/core/Snackbar';
 import $ = require('jquery');
-import { CueVid, VideoState, VideoStateClient } from "../_backend/youtubeHandler";
+import { CueVid, VideoState } from "../_backend/youtubeHandler";
 import { createScript } from "../utils/common";
 
 interface YoutubeProps {
@@ -49,21 +49,22 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         this.ytPlayer.setVolume(audioValue);
     }
 
-    seekBasedOnState(state: VideoStateClient) {
+    seekBasedOnState(state: VideoState) {
         if (state.isPaused) {
             this.ytPlayer.seekTo(state.timeOffset);
             this.ytPlayer.playVideo();
             this.ytPlayer.pauseVideo();
         }
         if (!state.isPaused) {
-            this.ytPlayer.seekTo(state.timeOffset + ((new Date().getTime() - new Date(state.startDate).getTime()) / 1000));
+            var startDate = state.startDate as Date;
+            this.ytPlayer.seekTo(state.timeOffset + ((new Date().getTime() - new Date(startDate).getTime()) / 1000));
             this.ytPlayer.playVideo();
         }
     }
 
     initPlayer(ytState: JQuery.jqXHR<any>) {
         var self = this;
-        ytState.then((res: VideoStateClient | null) => {
+        ytState.then((res: VideoState | null) => {
             var settings = {
                 videoId: '',
                 playerVars: {
@@ -83,29 +84,29 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             }
             // @ts-ignore
             self.ytPlayer = new YT.Player('player', settings);
+        });
 
-            window.socket.on('cueVideo', (res: string) => {
-                self.ytPlayer.cueVideoById(res);
-                self.ytPlayer.seekTo(0);
-                self.ytPlayer.playVideo();
-                self.ytPlayer.pauseVideo();
-                self.setState({ videoCued: true });
+        window.socket.on('cueVideo', (res: string) => {
+            self.ytPlayer.cueVideoById(res);
+            self.ytPlayer.seekTo(0);
+            self.ytPlayer.playVideo();
+            self.ytPlayer.pauseVideo();
+            self.setState({ videoCued: true });
+        });
+        window.socket.on('playVideo', () => {
+            self.ytPlayer.playVideo();
+        });
+        window.socket.on('pauseVideo', () => {
+            self.ytPlayer.pauseVideo();
+        });
+        window.socket.on('seekVideo', (res: VideoState) => {
+            self.seekBasedOnState(res);
+        });
+        window.socket.on('videoTimeout', () => {
+            this.setState({
+                snackBarOpen: true
             });
-            window.socket.on('playVideo', () => {
-                self.ytPlayer.playVideo();
-            });
-            window.socket.on('pauseVideo', () => {
-                self.ytPlayer.pauseVideo();
-            });
-            window.socket.on('seekVideo', (res: VideoStateClient) => {
-                self.seekBasedOnState(res);
-            });
-            window.socket.on('videoTimeout', () => {
-                this.setState({
-                    snackBarOpen: true
-                });
-            });
-        })
+        });
     }
 
     cueVideo(event: React.KeyboardEvent<HTMLDivElement>) {

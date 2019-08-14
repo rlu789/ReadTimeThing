@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { IRoom } from "../_backend/room";
 import { History } from "history";
+import { RoomTypes } from "../_backend/constants";
 
 interface LobbyCardProps {
     roomModel: IRoom;
@@ -42,6 +43,16 @@ export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
                 <CardContent>
                     <Typography variant="h5" component="h2">
                         {l.name}
+                    </Typography>
+                    <Typography color="textSecondary">
+                        {(() => {
+                            switch (l.roomType) {
+                                case RoomTypes.Youtube:
+                                    return <span>Watching Vids</span>
+                                case RoomTypes.Chess:
+                                    return <span>Being nerds</span>
+                            }
+                        })()}
                     </Typography>
                     {l.description ? (
                         <Typography variant="body2" component="p">

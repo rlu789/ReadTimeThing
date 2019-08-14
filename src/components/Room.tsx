@@ -86,7 +86,7 @@ export class Room extends React.Component<RoomProps, RoomState> {
                         {roomContent}
                     </div>
                     <div className="col-md-6 col-lg-4">
-                        <Tabs value={this.state.tabValue} onChange={this.handleTabChange.bind(this)}>
+                        <Tabs variant="fullWidth" value={this.state.tabValue} onChange={this.handleTabChange.bind(this)}>
                             <Tab label="Chat" />
                             <Tab label="Room Info" />
                         </Tabs>

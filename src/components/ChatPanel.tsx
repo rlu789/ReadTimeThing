@@ -105,7 +105,7 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
                                 value={this.state.message}
                             />
                         </div>
-                        <div className="col-2 send-btn">
+                        <div className="d-none d-lg-block col-2 send-btn">
                             <Button variant="contained" color="primary"
                                 onClick={() => this.sendMessage(undefined, true)}>
                                 Send

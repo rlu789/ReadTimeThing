@@ -26,7 +26,7 @@ interface LobbyState {
 export class Lobby extends React.Component<LobbyProps, LobbyState> {
     constructor(props: LobbyProps) {
         super(props);
-        // console.log(this.props);
+        $("body").css("overscroll-behavior-y", "initial"); /* Enables pull-to-refresh but allows overscroll glow effects. */
 
         this.state = {
             modalOpen: false,

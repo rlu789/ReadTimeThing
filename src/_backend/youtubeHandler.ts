@@ -7,13 +7,6 @@ export interface VideoState {
     isPaused: boolean;
     timeOffset: number;
 }
-export interface VideoStateClient {
-    id: string;
-    startDate: Date;
-    isPaused: boolean;
-    timeOffset: number;
-}
-
 export interface CueVid {
     vidId: string;
     roomId: string;

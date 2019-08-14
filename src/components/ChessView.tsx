@@ -10,9 +10,10 @@ interface ChessViewState {
 }
 
 export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
-    private scriptsLoaded = 0;
     constructor(props: ChessViewProps) {
         super(props);
+
+        $("body").css("overscroll-behavior-y", "contain"); /* Disables pull-to-refresh but allows overscroll glow effects. */
     }
 
     componentDidMount() {
@@ -20,20 +21,18 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
         createStyle('/assets/chessboardjs/css/chessboard-1.0.0.min.css');
 
         var doneFunc = function () {
-            if (++self.scriptsLoaded === 1) {
-                var c = new Chess();
-                console.log(c.ascii());
+            var c = new Chess();
+            console.log(c.ascii());
 
-                var config: BoardConfig = {
-                    draggable: true,
-                    position: 'start',
-                    pieceTheme: ((piece: string) => {
-                        return '/img/chesspieces/wikipedia/' + piece + '.png' ;
-                    }) as any // BoardConfig type doesn't account for pieceTheme being a func
-                };
+            var config: BoardConfig = {
+                draggable: true,
+                position: 'start',
+                pieceTheme: ((piece: string) => {
+                    return '/img/chesspieces/wikipedia/' + piece + '.png';
+                }) as any // BoardConfig type doesn't account for pieceTheme being a func
+            };
 
-                var board = window.Chessboard('myBoard', config);
-            }
+            var board = window.Chessboard('myBoard', config);
         }
         createScript('/assets/chessboardjs/js/chessboard-1.0.0.min.js', doneFunc, undefined, doneFunc);
     }
