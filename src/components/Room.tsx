@@ -80,12 +80,12 @@ export class Room extends React.Component<RoomProps, RoomState> {
         }
 
         return (
-            <div className="container-fluid fade-in">
+            <div className="container fade-in">
                 <div className="row">
-                    <div className="col-md-6 col-lg-8">
+                    <div className="col-md col-lg-8">
                         {roomContent}
                     </div>
-                    <div className="col-md-6 col-lg-4">
+                    <div className="col-md col-lg-4">
                         <Tabs variant="fullWidth" value={this.state.tabValue} onChange={this.handleTabChange.bind(this)}>
                             <Tab label="Chat" />
                             <Tab label="Room Info" />

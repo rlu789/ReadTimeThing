@@ -39,7 +39,7 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
 
     render() {
         return (
-            <div className="container">
+            <div className="chess-view">
                 <div id="myBoard" className="chess-board"></div>
             </div>
         );
