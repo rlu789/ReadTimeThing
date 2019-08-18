@@ -73,7 +73,7 @@
                 opacity: 1;
             }
         }
-        
+
         header a {
             color: inherit;
         }
@@ -150,8 +150,21 @@
             .youtube {
                 overflow-x: hidden;
             }
+
             .youtube #player {
                 width: 70vw;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .chess-board .chess-tile,
+            .chess-board .chess-tile img {
+                width: 42px !important;
+                height: 42px !important;
+            }
+
+            .chess-board > div > div {
+                width: 336px !important;
             }
         }
     </style>

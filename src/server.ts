@@ -11,6 +11,7 @@ import { ClientManager } from "./_backend/clientManager";
 import { Message } from "./_backend/message";
 import { RoomManager } from "./_backend/roomManager";
 import { YoutubeHandler } from "./_backend/youtubeHandler";
+import { ChessHandler } from "./_backend/chessHandler";
 
 app.use(express.static("dist"));
 app.use("/room/*", express.static("dist"));
@@ -23,6 +24,7 @@ var RoomModel = new Room();
 var MessageModel = new Message();
 var Rooms = new RoomManager(RoomModel, MessageModel);
 var YT = new YoutubeHandler();
+var Chess = new ChessHandler();
 var Clients = new ClientManager(Rooms);
 
 io.on('connection', (socket) => {
