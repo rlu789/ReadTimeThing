@@ -57,7 +57,7 @@ export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
                 <DialogTitle id="form-dialog-title">Add Lobby</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        <span>Add a lobby haha</span>
+                        <span>Add a lobby</span>
                     </DialogContentText>
                     <TextField
                         autoFocus

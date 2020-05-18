@@ -14,7 +14,8 @@ export class ClientManager {
 
     constructor(public roomManager: RoomManager) {
         app.get("/user", (req, res) => {
-            res.status(200).send(this.clients[req.query.id]);
+            console.log(req.query);
+            res.status(200).send(this.clients[(<any>req.query).id]);
         });
         app.post("/user", (req, res) => {
             this.clients[req.body.id].name = req.body.name;

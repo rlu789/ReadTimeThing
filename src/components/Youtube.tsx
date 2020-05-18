@@ -6,6 +6,8 @@ import FastForward from "@material-ui/icons/FastForward";
 import FastRewind from "@material-ui/icons/FastRewind";
 import Slider from '@material-ui/lab/Slider';
 import Snackbar from '@material-ui/core/Snackbar';
+import Popover from '@material-ui/core/Popover';
+import Typography from '@material-ui/core/Typography';
 import $ = require('jquery');
 import { CueVid, VideoState } from "../_backend/youtubeHandler";
 import { createScript } from "../utils/common";
@@ -17,6 +19,8 @@ interface YoutubeState {
     videoCued: boolean;
     audioValue: number;
     snackBarOpen: boolean;
+    videoCuedOpen: boolean;
+    popoverOpen: boolean;
 }
 
 export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
@@ -28,7 +32,9 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         this.state = {
             audioValue: 100,
             snackBarOpen: false,
-            videoCued: false
+            videoCued: false,
+            videoCuedOpen: false,
+            popoverOpen: false
         };
 
         var ytState = $.get("/youtube", { roomId: this.props.roomId });
@@ -73,7 +79,9 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                 events: {
                     'onReady': () => { },
                     'onStateChange': () => { }
-                }
+                },
+                width: 1600,
+                height: 700
             };
             if (res && res.id) {
                 settings.videoId = res.id;
@@ -91,7 +99,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             self.ytPlayer.seekTo(0);
             self.ytPlayer.playVideo();
             self.ytPlayer.pauseVideo();
-            self.setState({ videoCued: true });
+            self.setState({ videoCued: true, videoCuedOpen: true });
         });
         window.socket.on('playVideo', () => {
             self.ytPlayer.playVideo();
@@ -177,12 +185,20 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                             <FastForward />
                         </IconButton>
                         <Slider className="audio-slider" onChange={(e, v) => this.changeAudio(e, v)} value={this.state.audioValue} />
-                    </div> : <p className="mx-auto">Please load a video</p>}
+                    </div> : <p className="mx-auto">Load Youtube videos by inserting a Youtube URL into the text field and then pressing 'Enter'</p>}
                 </div>
-                <div hidden={!this.state.videoCued} className="fade-in row no-gutters">
+                <div hidden={!this.state.videoCued} className="fade-in row no-gutters"
+                    onMouseEnter={() => { this.setState({ popoverOpen: true }) }}
+                    onMouseLeave={() => { this.setState({ popoverOpen: false }) }}>
                     <div id="player" tabIndex={-1}>
                     </div>
                 </div>
+                <Popover
+                    open={this.state.popoverOpen}
+                    disableRestoreFocus
+                >
+                    <Typography>I use Popover.</Typography>
+                </Popover>
 
                 <Snackbar
                     anchorOrigin={{
@@ -193,6 +209,16 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                     onClose={this.snackBarClose.bind(this)}
                     autoHideDuration={1000}
                     message={<span>Please wait.</span>}
+                />
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={this.state.videoCuedOpen}
+                    onClose={() => { this.setState({ videoCuedOpen: false }); }}
+                    autoHideDuration={1000}
+                    message={<span>Video queued, ready to play</span>}
                 />
             </div>
         );

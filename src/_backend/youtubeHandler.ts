@@ -57,7 +57,7 @@ export class YoutubeHandler {
 
     constructor() {
         app.get('/youtube', (req, res) => {
-            var roomId = req.query.roomId;
+            var roomId = (<any>req.query).roomId;
             var video = this.videos[roomId];
             if (video) {
                 res.status(200).send(video.state);
