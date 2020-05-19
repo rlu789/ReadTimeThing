@@ -31,12 +31,6 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
         };
 
         $("body").css("overscroll-behavior-y", "contain"); /* Disables pull-to-refresh but allows overscroll glow effects. */
-
-        window.socket.on('chessMove', (m: ShortMove) => {
-            console.log(m);
-            this.game.move(m);
-            this.board.position(this.game.fen());
-        });
     }
 
     initChess(fen: string | undefined) {
@@ -155,6 +149,13 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
 
             createStyle('/assets/chessboardjs/css/chessboard-1.0.0.min.css');
             createScript('/assets/chessboardjs/js/chessboard-1.0.0.min.js', this.initChess.bind(this, res.fenPosition), undefined, this.initChess.bind(this, res.fenPosition));
+
+            window.socket.on('chessMove', (m: ShortMove) => {
+                console.log(m);
+                console.log(this.game.fen());
+                this.game.move(m);
+                this.board.position(this.game.fen());
+            });
         });
     }
 
