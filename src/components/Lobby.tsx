@@ -71,7 +71,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
         });
         if (lReq) {
             $.post("/addRoom", lReq).then((room: IRoom) => {
-                this.props.history.push("/room/" + room._id);
+                this.props.history.push("/room/" + room.roomType + "/" + room._id);
             });
         }
     }
@@ -87,7 +87,7 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
         this.setState(prevState => ({
             ...prevState,
             [key]: v,
-        }))
+        }));
     }
 
     updateName() {

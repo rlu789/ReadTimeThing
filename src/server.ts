@@ -28,7 +28,7 @@ var Chess = new ChessHandler();
 var Clients = new ClientManager(Rooms);
 
 io.on('connection', (socket) => {
-  Clients.newClient(socket, YT);
+  Clients.newClient(socket, YT, Chess);
 });
 
 mongoose.connect(secret.privateDbUrl, { useNewUrlParser: true }, (err) => {

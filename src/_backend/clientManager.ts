@@ -2,6 +2,7 @@ import ioImport = require('socket.io');
 import { app, io } from './global';
 import { RoomManager } from './roomManager';
 import { YoutubeHandler } from './youtubeHandler';
+import { ChessHandler } from './chessHandler';
 
 export interface ClientData {
     rooms: { [key: string]: string };
@@ -43,7 +44,7 @@ export class ClientManager {
         });
     }
 
-    public newClient(socket: ioImport.Socket, yt: YoutubeHandler) {
+    public newClient(socket: ioImport.Socket, yt: YoutubeHandler, chs: ChessHandler) {
         var self = this;
         this.clients[socket.id] = {
             rooms: {},
@@ -56,7 +57,10 @@ export class ClientManager {
             self.clients[socket.id].rooms[roomId] = roomId;
 
             self.updateGuestCount(roomId);
+
+            //TODO only register events for the room that you are in
             yt.registerEvents(socket);
+            chs.registerEvents(socket);
         });
 
         socket.on('unsubscribe', function (roomId: string) {

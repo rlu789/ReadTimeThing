@@ -20,7 +20,7 @@ interface LobbyAddProps {
 interface LobbyAddState {
     lobbyName: string;
     lobbyDesc: string;
-    lobbyType: number;
+    lobbyType: string;
 }
 
 export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
@@ -30,7 +30,7 @@ export class LobbyAdd extends React.Component<LobbyAddProps, LobbyAddState> {
         this.state = {
             lobbyName: "",
             lobbyDesc: "",
-            lobbyType: 0
+            lobbyType: RoomTypes.Youtube
         }
     }
 

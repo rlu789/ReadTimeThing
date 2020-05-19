@@ -74,14 +74,14 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
             var settings = {
                 videoId: '',
                 playerVars: {
-                    origin: window.location.origin, disablekb: 1, controls: 1, start: 0,
+                    origin: window.location.origin, disablekb: 1, controls: 0, start: 0,
                 },
                 events: {
                     'onReady': () => { },
                     'onStateChange': () => { }
                 },
                 width: 1600,
-                height: 700
+                height: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? undefined: 700
             };
             if (res && res.id) {
                 settings.videoId = res.id;

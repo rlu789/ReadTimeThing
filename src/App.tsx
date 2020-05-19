@@ -60,7 +60,7 @@ class App extends React.Component<{}, {}> {
                     </AppBar>
 
                     <Route path="/" exact component={Lobby} />
-                    <Route path="/room/:id" component={Room} />
+                    <Route path="/room/:type/:id" component={Room} />
                 </Router>
             </div>
         );

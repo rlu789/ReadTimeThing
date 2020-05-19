@@ -16,6 +16,7 @@ interface RoomProps extends RouteComponentProps {
 interface RoomState {
     clients: { [key: string]: string };
     roomId: string;
+    roomType: string;
     tabValue: number;
     roomInfo: IRoom | "" | null;
 }
@@ -30,6 +31,7 @@ export class Room extends React.Component<RoomProps, RoomState> {
         this.state = {
             clients: {},
             roomId: routeParams.id,
+            roomType: routeParams.type,
             tabValue: 0,
             roomInfo: null
         };
@@ -72,10 +74,15 @@ export class Room extends React.Component<RoomProps, RoomState> {
         var roomContent: JSX.Element = <div className="loader"><CircularProgress /></div>;
         
         if (roomInfo !== null) {
-            if (roomInfo === "" || (typeof roomInfo === "object" && roomInfo.roomType === RoomTypes.Youtube))
-                roomContent = <Youtube roomId={this.state.roomId}></Youtube>;
-            else if (typeof roomInfo === "object" && roomInfo.roomType === RoomTypes.Chess) {
-                roomContent = <ChessView></ChessView>;
+            switch (this.state.roomType) {
+                case RoomTypes.Youtube:
+                    roomContent = <Youtube roomId={this.state.roomId}></Youtube>;
+                    break;
+                case RoomTypes.Chess:
+                    roomContent = <ChessView roomId={this.state.roomId}></ChessView>;
+                    break;
+                default:
+                    break;
             }
         }
 

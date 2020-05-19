@@ -32,8 +32,8 @@ export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
         });
     }
 
-    joinRoom(roomId: string) {
-        this.props.history.push("/room/" + roomId);
+    joinRoom(roomId: string, type: string) {
+        this.props.history.push("/room/" + type + "/" + roomId);
     }
 
     render() {
@@ -64,7 +64,7 @@ export class LobbyCard extends React.Component<LobbyCardProps, LobbyCardState> {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small" color="primary" onClick={() => { this.joinRoom(l._id) }}>Join</Button>
+                    <Button size="small" color="primary" onClick={() => { this.joinRoom(l._id, l.roomType) }}>Join</Button>
                 </CardActions>
             </Card>
         );

@@ -4,13 +4,13 @@ import { RoomTypes } from './constants';
 
 export interface RoomReq {
     name: string;
-    roomType: number;
+    roomType: string;
     description?: string;
 }
 export interface IRoom {
     name: string;
     description: string;
-    roomType: number;
+    roomType: string;
     guests: number;
     createAt: string;
     _id: string;
@@ -20,7 +20,7 @@ export class Room {
     public Model = mongoose.model('Room', new mongoose.Schema({
         name: String,
         description: String,
-        roomType: { type: Number, default: RoomTypes.Youtube },
+        roomType: { type: String, default: RoomTypes.Youtube },
         guests: { type: Number, default: 0 },
         createAt: { type: Date, default: Date.now },
     }));

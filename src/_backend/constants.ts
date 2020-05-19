@@ -1,4 +1,4 @@
-export var RoomTypes: {[key: string]: number} = {
-    Youtube: 0,
-    // Chess: 1
+export var RoomTypes: {[key: string]: string} = {
+    Youtube: 'y',
+    Chess: 'c'
 }
