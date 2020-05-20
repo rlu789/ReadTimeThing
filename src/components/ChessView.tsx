@@ -159,6 +159,10 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
         });
     }
 
+    componentWillUnmount() {
+        window.socket.off("chessMove");
+    }
+
     render() {
         var txt: string;
         switch (this.state.player) {

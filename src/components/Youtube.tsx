@@ -80,7 +80,7 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
                     'onReady': () => { },
                     'onStateChange': () => { }
                 },
-                width: 1600,
+                width: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? undefined: 1600,
                 height: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? undefined: 700
             };
             if (res && res.id) {
@@ -158,6 +158,14 @@ export class Youtube extends React.Component<YoutubeProps, YoutubeState> {
         this.setState({
             snackBarOpen: false
         });
+    }
+
+    componentWillUnmount() {
+        window.socket.off("cueVideo");
+        window.socket.off("playVideo");
+        window.socket.off("pauseVideo");
+        window.socket.off("seekVideo");
+        window.socket.off("videoTimeout");
     }
 
     render() {

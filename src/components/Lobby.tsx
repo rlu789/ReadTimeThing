@@ -19,6 +19,7 @@ interface LobbyProps extends RouteComponentProps {
 interface LobbyState {
     modalOpen: boolean;
     username: string;
+    prevUsername: string;
     snackBarOpen: boolean;
     rooms?: IRoom[];
 }
@@ -31,7 +32,8 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
         this.state = {
             modalOpen: false,
             snackBarOpen: false,
-            username: stateManager.get("user")
+            username: stateManager.get("user"),
+            prevUsername: stateManager.get("user")
         };
 
         $.get("/allRooms").then((res: IRoom[]) => {
@@ -91,12 +93,14 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
     }
 
     updateName() {
-        $.post("/user", { name: this.state.username, id: window.socket.id }).then(() => {
-            stateManager.set("user", this.state.username);
-            this.setState({
-                snackBarOpen: true
+        if (this.state.username !== this.state.prevUsername)
+            $.post("/user", { name: this.state.username, id: window.socket.id }).then(() => {
+                stateManager.set("user", this.state.username);
+                this.setState({
+                    snackBarOpen: true,
+                    prevUsername: this.state.username
+                });
             });
-        });
     }
 
     snackBarClose(event: object, reason: string) {
