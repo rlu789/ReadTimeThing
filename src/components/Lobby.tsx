@@ -67,6 +67,11 @@ export class Lobby extends React.Component<LobbyProps, LobbyState> {
         });
     }
 
+    componentWillUnmount() {
+        window.socket.off('roomAdded');
+        window.socket.off('roomRemoved');
+    }
+
     handleClose(lReq?: RoomReq) {
         this.setState({
             modalOpen: false

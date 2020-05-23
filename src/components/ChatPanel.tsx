@@ -45,6 +45,10 @@ export class ChatPanel extends React.Component<ChatPanelProps, ChatPanelState> {
         });
     }
 
+    componentWillUnmount() {
+        window.socket.off('messageAdded');
+    }
+
     handleChange(key: string, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         var v = event.currentTarget.value;
         this.setState(prevState => ({

@@ -125,19 +125,9 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
         self.board.position(self.game.fen());
         if (self.state.player === Player.Black) self.board.flip();
 
-        function mobile() {
-            var w = $(window).width();
-            if (w && (w <= 420))
-                $('div[class^="square-"]').addClass('chess-tile');
-            else
-                $('.chess-tile').removeClass('chess-tile');
-        }
         $(window).resize(function () {
-            mobile();
+            self.board.resize();
         });
-        mobile();
-        // $('.chess-tile').attr("style", "");
-        // $('.chess-tile img').attr("style", "");
     }
 
     componentDidMount() {
@@ -151,8 +141,6 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
             createScript('/assets/chessboardjs/js/chessboard-1.0.0.min.js', this.initChess.bind(this, res.fenPosition), undefined, this.initChess.bind(this, res.fenPosition));
 
             window.socket.on('chessMove', (m: ShortMove) => {
-                console.log(m);
-                console.log(this.game.fen());
                 this.game.move(m);
                 this.board.position(this.game.fen());
             });
@@ -164,7 +152,7 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
     }
 
     render() {
-        var txt: string;
+        var txt: string = '';
         switch (this.state.player) {
             case Player.White:
                 txt = 'Playing as white';
@@ -172,7 +160,7 @@ export class ChessView extends React.Component<ChessViewProps, ChessViewState> {
             case Player.Black:
                 txt = 'Playing as black';
                 break;
-            default:
+            case Player.Spectator:
                 txt = 'Spectating';
                 break;
         }
